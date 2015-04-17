@@ -35,16 +35,16 @@ class Tx_FlRealurlImage_Service_FileInformation {
 	/**
 	 * Get information from the fal record of the current rendering
 	 *
-	 * @param array          $imageInformation
+	 * @param array                                                    $imageInformation
 	 *
-	 * @param                $file
-	 * @param                $conf
-	 * @param  ux_tslib_cObj $cObj
+	 * @param                                                          $file
+	 * @param                                                          $conf
+	 * @param  \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $cObj
 	 *
 	 * @return array
 	 */
 	public function getByFalReference($imageInformation, $file, $conf, $cObj) {
-		if (!($cObj instanceof ux_tslib_cObj)) {
+		if (!($cObj instanceof \FRUIT\FlRealurlImage\Xclass\ContentObjectRenderer)) {
 			return array();
 		}
 		$fileReference = NULL;

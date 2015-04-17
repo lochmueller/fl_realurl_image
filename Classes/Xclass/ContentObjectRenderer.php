@@ -23,13 +23,18 @@
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
 
-require_once(t3lib_extMgm::extPath('fl_realurl_image') . 'Classes/class.tx_flrealurlimage.php');
+
+namespace FRUIT\FlRealurlImage\Xclass;
+
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
+require_once(\t3lib_extMgm::extPath('fl_realurl_image') . 'Classes/class.tx_flrealurlimage.php');
 
 /**
  * Extends tslib_cObj to change the path for the images
  *
  */
-class ux_tslib_cObj extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
+class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
 
 	/**
 	 * Rendering the cObject, IMG_RESOURCE
@@ -47,7 +52,7 @@ class ux_tslib_cObj extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRende
 		// ## Here begins RealUrl_image ######
 		// ###################################
 		// call fl_realurl_image to generate $new_fileName
-		$tx_flrealurlimage = new tx_flrealurlimage();
+		$tx_flrealurlimage = new \tx_flrealurlimage();
 		$tx_flrealurlimage->start($this->data, $this->table);
 		$new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
 		$imageResource = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
@@ -71,7 +76,7 @@ class ux_tslib_cObj extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRende
 
 		if (is_array($info)) {
 			if (is_file(PATH_site . $info['3'])) {
-				$source = t3lib_div::rawUrlEncodeFP(t3lib_div::png_to_gif_by_imagemagick($info[3]));
+				$source = GeneralUtility::rawUrlEncodeFP(GeneralUtility::png_to_gif_by_imagemagick($info[3]));
 				$source = $GLOBALS['TSFE']->absRefPrefix . $source;
 			} else {
 				$source = $info[3];
@@ -107,7 +112,7 @@ class ux_tslib_cObj extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRende
 			// ###################################
 			// ## Here begins RealUrl_image ######
 			// ###################################
-			$tx_flrealurlimage = new tx_flrealurlimage();
+			$tx_flrealurlimage = new \tx_flrealurlimage();
 			$tx_flrealurlimage->start($this->data, $this->table);
 			$new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
 			$imageTagValues['src'] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;

@@ -14,13 +14,11 @@ $GLOBALS['fl_realurl_image'] = unserialize($_EXTCONF);
 // if linkStatic is activated this is just a back up in case a link got lost.
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.hook_tslib_fe.php']['connectToDB']['tx_flrealurlimage'] = 'EXT:fl_realurl_image/Classes/class.hook_tslib_fe.php:&hook_tslib_fe->checkImageDecode';
 
-// TYPO3 4.x
-$GLOBALS['TYPO3_CONF_VARS']['FE']['XCLASS']['tslib/class.tslib_content.php'] = t3lib_extMgm::extPath($_EXTKEY) . 'Classes/class.ux_tslib_cObj.php';
+// @deprecated
 $GLOBALS['TYPO3_CONF_VARS']['FE']['XCLASS']['tslib/content/class.tslib_content_imageresource.php'] = t3lib_extMgm::extPath($_EXTKEY) . 'Classes/Xclass/ImageResource.php';
 
-// TYPO3 6.x
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer'] = array(
-	'className' => 'ux_tslib_cObj',
+	'className' => 'FRUIT\\FlRealurlImage\\Xclass\\ContentObjectRenderer',
 );
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObject\\ImageResourceContentObject'] = array(
 	'className' => 'ux_tslib_content_ImageResource',
