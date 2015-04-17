@@ -30,10 +30,15 @@
 class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
 
 	private $IMAGE_conf = array(); // IMAGE-Object config
+
 	private $fl_conf = array(); // config.fl_realurl_image from setup.txt / TypoScript merged with IMAGE-Object.fl_realurl_image
+
 	private $fl_config = array(); // config from ext_conf_template.txt  (install-tool)
+
 	private $image = array(); // image Array of Typo3
+
 	private $fileTypeInformation = array(); // info about the file type
+
 	/*
 	  - 0: Height
 	  - 1: Weight
@@ -170,11 +175,8 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 			$local_conf = $conf['fl_realurl_image.'];
 		}
 
-		if(method_exists('t3lib_div', 'array_merge_recursive_overrule')) {
-			$global_conf = \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($global_conf, $local_conf, FALSE, FALSE);
-		} else {
-			t3lib_utility_Array::mergeRecursiveWithOverrule($global_conf, $local_conf, TRUE, FALSE);
-		}
+		$global_conf = \TYPO3\CMS\Extbase\Utility\ArrayUtility::arrayMergeRecursiveOverrule($global_conf, $local_conf);
+
 
 		$this->fl_conf = $global_conf;
 
@@ -198,7 +200,7 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		}
 
 		$enableByConfiguration = (bool)$this->fl_conf['enable'];
-		if(!$enableByConfiguration) {
+		if (!$enableByConfiguration) {
 			$this->enable = $enableByConfiguration;
 		}
 
@@ -210,7 +212,7 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		}
 
 		// org_fileName
-		$this->org_fileName = htmlspecialchars(trim(t3lib_div::rawUrlEncodeFP($image[3])));
+		$this->org_fileName = htmlspecialchars(trim(\TYPO3\CMS\Core\Utility\GeneralUtility::rawUrlEncodeFP($image[3])));
 	}
 
 	/**
@@ -278,10 +280,10 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		$mediaInfo = $this->getMEDIAInfo();
 
 		// walk the options until a possible base for a file-name is found
-		$parts = t3lib_div::trimExplode('//', $this->fl_conf['data'], TRUE);
+		$parts = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('//', $this->fl_conf['data'], TRUE);
 		$partSize = sizeof($parts);
 		for ($i = 0; $i < $partSize; $i++) {
-			list($source, $item) = t3lib_div::trimExplode(':', $parts[$i], TRUE);
+			list($source, $item) = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(':', $parts[$i], TRUE);
 
 			switch ($source) {
 				case 'falref':
@@ -336,11 +338,8 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 	 * @return bool|Tx_FlRealurlImage_Service_FileInformation
 	 */
 	protected function getFileInformation() {
-		if (t3lib_div::compat_version('6.0.0')) {
-			require_once(t3lib_extMgm::extPath('fl_realurl_image', 'Classes/Service/FileInformation.php'));
-			return new Tx_FlRealurlImage_Service_FileInformation();
-		}
-		return FALSE;
+		require_once(t3lib_extMgm::extPath('fl_realurl_image', 'Classes/Service/FileInformation.php'));
+		return new Tx_FlRealurlImage_Service_FileInformation();
 	}
 
 	/**
@@ -382,9 +381,9 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 	 * @return        array        info from DAM
 	 */
 	private function getDAMinfo() {
-		if ($this->image['origFile'] && t3lib_extMgm::isLoaded('dam')) {
+		if ($this->image['origFile'] && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('dam')) {
 			// get information for item from tx_dam
-			$items = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'tx_dam', '(file_name = "' . basename($this->image['origFile']) . '" AND file_path = "' . t3lib_div::dirname($this->image['origFile']) . '/") ' . $this->enableFields('tx_dam') // $this->cObj = $this as we XCLASS cObj
+			$items = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'tx_dam', '(file_name = "' . basename($this->image['origFile']) . '" AND file_path = "' . \TYPO3\CMS\Core\Utility\GeneralUtility::dirname($this->image['origFile']) . '/") ' . $this->enableFields('tx_dam') // $this->cObj = $this as we XCLASS cObj
 				. ' AND sys_language_uid=0');
 			// get language overlay
 			if ($GLOBALS['TSFE']->sys_language_content) {
@@ -463,7 +462,7 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 
 		$hashBase = $org_base;
 		if (isset($this->image[3]) && strlen($this->image[3])) {
-			$hashBase = t3lib_div::shortMD5($this->image[3], 24);
+			$hashBase = \TYPO3\CMS\Core\Utility\GeneralUtility::shortMD5($this->image[3], 24);
 		}
 		$hashLength = isset($this->fl_conf['hashLength']) ? (int)$this->fl_conf['hashLength'] : 0;
 
@@ -614,9 +613,9 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		}
 
 		// create folder if required
-		$new_folder = t3lib_div::dirname($new_path);
+		$new_folder = \TYPO3\CMS\Core\Utility\GeneralUtility::dirname($new_path);
 		if ($new_folder && !is_dir($new_folder)) {
-			if (!t3lib_div::mkdir($new_folder)) {
+			if (!\TYPO3\CMS\Core\Utility\GeneralUtility::mkdir($new_folder)) {
 				throw new Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
 			}
 		}
