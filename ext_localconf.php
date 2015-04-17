@@ -26,14 +26,4 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObje
 	'className' => 'ux_tslib_content_ImageResource',
 );
 
-
-// Sheduler
-if (TYPO3_MODE == 'BE') {
-	if (class_exists('tx_scheduler_Task')) {
-		require_once(t3lib_extMgm::extPath('fl_realurl_image', 'Classes/Service/CleanTask.php'));
-	}
-	$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['scheduler']['tasks']['Tx_FlRealurlImage_CleanTask'] = array(
-		'extension' => $_EXTKEY,
-		'title'     => 'Cleanup RealURL Images',
-	);
-}
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = 'FRUIT\\FlRealurlImage\\Command\\CleanCommandController';
