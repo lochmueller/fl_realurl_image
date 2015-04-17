@@ -16,7 +16,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.hook_tslib_fe.php']['conn
 
 // TYPO3 4.x
 $GLOBALS['TYPO3_CONF_VARS']['FE']['XCLASS']['tslib/class.tslib_content.php'] = t3lib_extMgm::extPath($_EXTKEY) . 'Classes/class.ux_tslib_cObj.php';
-$GLOBALS['TYPO3_CONF_VARS']['FE']['XCLASS']['tslib/content/class.tslib_content_imageresource.php'] = t3lib_extMgm::extPath($_EXTKEY) . 'Classes/XClass/ImageResource.php';
+$GLOBALS['TYPO3_CONF_VARS']['FE']['XCLASS']['tslib/content/class.tslib_content_imageresource.php'] = t3lib_extMgm::extPath($_EXTKEY) . 'Classes/Xclass/ImageResource.php';
 
 // TYPO3 6.x
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer'] = array(

@@ -40,8 +40,3 @@ class ux_tslib_content_ImageResource extends tslib_content_ImageResource {
 	}
 
 }
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/XClass/ImageResource.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/XClass/ImageResource.php']);
-}
-?>
