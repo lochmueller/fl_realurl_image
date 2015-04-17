@@ -25,11 +25,15 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
+use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class Tx_FlRealurlImage_CleanTask
  */
-class Tx_FlRealurlImage_CleanTask extends tx_scheduler_Task {
+class Tx_FlRealurlImage_CleanTask extends \TYPO3\CMS\Scheduler\Task\AbstractTask {
 
 	/**
 	 * Run the Scheduler
@@ -66,7 +70,7 @@ class Tx_FlRealurlImage_CleanTask extends tx_scheduler_Task {
 					->exec_DELETEquery('tx_flrealurlimage_cache', 'uid IN (' . implode(',', $ids) . ')');
 
 				$msg = 'Found ' . $row['c'] . ' of "' . $row['image_path'] . '"-path and delete ' . sizeof($ids) . ' entries.';
-				t3lib_FlashMessageQueue::addMessage(t3lib_div::makeInstance('t3lib_FlashMessage', '', $msg, t3lib_FlashMessage::INFO));
+				FlashMessageQueue::addMessage(GeneralUtility::makeInstance('t3lib_FlashMessage', '', $msg, FlashMessage::INFO));
 			}
 		}
 	}
@@ -86,14 +90,10 @@ class Tx_FlRealurlImage_CleanTask extends tx_scheduler_Task {
 	}
 
 	/**
-	 * @return \TYPO3\CMS\Core\Database\DatabaseConnection
+	 * @return DatabaseConnection
 	 */
 	protected function getDatabase() {
 		return $GLOBALS['TYPO3_DB'];
 	}
 
-}
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/Service/CleanTask.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/Service/CleanTask.php']);
 }

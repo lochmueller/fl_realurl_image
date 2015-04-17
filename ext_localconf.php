@@ -37,4 +37,3 @@ if (TYPO3_MODE == 'BE') {
 		'title'     => 'Cleanup RealURL Images',
 	);
 }
-?>

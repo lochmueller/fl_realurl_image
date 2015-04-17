@@ -29,7 +29,7 @@ require_once(t3lib_extMgm::extPath('fl_realurl_image') . 'Classes/class.tx_flrea
  * Extends tslib_cObj to change the path for the images
  *
  */
-class ux_tslib_cObj extends tslib_cObj {
+class ux_tslib_cObj extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
 
 	/**
 	 * Rendering the cObject, IMG_RESOURCE
@@ -66,80 +66,6 @@ class ux_tslib_cObj extends tslib_cObj {
 	 * @return string
 	 */
 	function cImage($file, $conf) {
-		if (t3lib_div::compat_version('6.0')) {
-			$value = $this->cImage6x($file, $conf);
-		} else {
-			$value = $this->cImage4x($file, $conf);
-		}
-		return $value;
-	}
-
-	/**
-	 * Returns a <img> tag with the image file defined by $file and processed according to the properties in the TypoScript array.
-	 * Mostly this function is a sub-function to the IMAGE function which renders the IMAGE cObject in TypoScript. This function is called by "$this->cImage($conf['file'],$conf);" from IMAGE().
-	 *
-	 * @param        string $file File TypoScript resource
-	 * @param        array  $conf TypoScript configuration properties for the IMAGE object
-	 *
-	 * @return        string        <img> tag, (possibly wrapped in links and other HTML) if any image found.
-	 * @access private
-	 * @see    IMAGE()
-	 */
-	function cImage4x($file, $conf) {
-		$info = $this->getImgResource($file, $conf['file.']);
-		$GLOBALS['TSFE']->lastImageInfo = $info;
-
-		if (is_array($info)) {
-			$info[3] = t3lib_div::png_to_gif_by_imagemagick($info[3]);
-			$GLOBALS['TSFE']->imagesOnPage[] = $info[3]; // This array is used to collect the image-refs on the page...
-
-			if (!strlen($conf['altText']) && !is_array($conf['altText.'])) { // Backwards compatible:
-				$conf['altText'] = $conf['alttext'];
-				$conf['altText.'] = $conf['alttext.'];
-			}
-			$altParam = $this->getAltParam($conf);
-			// ###################################
-			// ## Here begins RealUrl_image ######
-			// ###################################
-			// call fl_realurl_image to generate $new_fileName
-			$tx_flrealurlimage = new tx_flrealurlimage();
-			$tx_flrealurlimage->start($this->data, $this->table);
-			$new_fileName = $tx_flrealurlimage->main($conf, $info, $file);
-			// generate the <img>-tag
-
-			if (isset($conf['params.']) && is_array($conf['params.'])) {
-				$conf['params'] = $this->stdWrap($conf['params'], $conf['params.']);
-			}
-
-			$theValue = '<img src="' . htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName . '"' . ' width="' . $info[0] . '" height="' . $info[1] . '"' . $this->getBorderAttr(' border="' . intval($conf['border']) . '"') . ($conf['params'] ? ' ' . $conf['params'] : '') . ($altParam) . ' />';
-			// ##################################
-			// ### Here ends RealURL_Image ######
-			// ##################################
-			/*
-			  $theValue = '<img src="'.htmlspecialchars($GLOBALS['TSFE']->absRefPrefix.t3lib_div::rawUrlEncodeFP($info[3])).'" width="'.$info[0].'" height="'.$info[1].'"'.$this->getBorderAttr(' border="'.intval($conf['border']).'"').(($conf['params'] || is_array($conf['params.']))?' '.$this->stdwrap($conf['params'],$conf['params.']):'').($altParam).' />';
-			 */
-			if ($conf['linkWrap']) {
-				$theValue = $this->linkWrap($theValue, $conf['linkWrap']);
-			} elseif ($conf['imageLinkWrap']) {
-				$theValue = $this->imageLinkWrap($theValue, $info['origFile'], $conf['imageLinkWrap.']);
-			}
-			return $this->wrap($theValue, $conf['wrap']);
-		}
-	}
-
-	/**
-	 * Returns a <img> tag with the image file defined by $file and processed according to the properties in the TypoScript array.
-	 * Mostly this function is a sub-function to the IMAGE function which renders the IMAGE cObject in TypoScript.
-	 * This function is called by "$this->cImage($conf['file'], $conf);" from IMAGE().
-	 *
-	 * @param string $file File TypoScript resource
-	 * @param array  $conf TypoScript configuration properties
-	 *
-	 * @return string <img> tag, (possibly wrapped in links and other HTML) if any image found.
-	 * @access private
-	 * @see    IMAGE()
-	 */
-	public function cImage6x($file, $conf) {
 		$info = $this->getImgResource($file, $conf['file.']);
 		$GLOBALS['TSFE']->lastImageInfo = $info;
 
@@ -217,8 +143,3 @@ class ux_tslib_cObj extends tslib_cObj {
 	}
 
 }
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/class.ux_tslib_cObj.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/class.ux_tslib_cObj.php']);
-}
-?>

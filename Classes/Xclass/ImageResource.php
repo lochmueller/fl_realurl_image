@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-class ux_tslib_content_ImageResource extends tslib_content_ImageResource {
+class ux_tslib_content_ImageResource extends \TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject {
 
 	public function render($conf = array()) {
 		$GLOBALS['TSFE']->lastImgResourceInfo = $this->cObj->getImgResource($conf['file'], $conf['file.']);

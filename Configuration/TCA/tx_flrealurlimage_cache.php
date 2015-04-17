@@ -4,8 +4,16 @@ if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
 
-$GLOBALS['TCA']['tx_flrealurlimage_cache'] = Array(
-	'ctrl'        => $GLOBALS['TCA']['tx_flrealurlimage_cache']['ctrl'],
+return array(
+	'ctrl'        => array(
+		'title'             => 'LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:fl_realurl_image.tabletitle',
+		'label'             => 'realurl_path',
+		'tstamp'            => 'tstamp',
+		'crdate'            => 'crdate',
+		'rootLevel'         => 1,
+		'dynamicConfigFile' => t3lib_extMgm::extPath('fl_realurl_image') . 'Configuration/TCA/Cache.php',
+		'iconfile'          => t3lib_extMgm::extRelPath('fl_realurl_image') . 'ext_icon.gif',
+	),
 	'interface'   => Array(
 		'showRecordFieldList' => ''
 	),

@@ -6,6 +6,8 @@
  * @package    ...
  * @author     Tim Lochmüller <tim@fruit-lab.de>
  */
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * @todo       General class information
@@ -88,13 +90,13 @@ class Tx_FlRealurlImage_Service_FileInformation {
 		return array();
 		// the AssetRepository do not exists anymore
 
-		if (!t3lib_extMgm::isLoaded('media')) {
+		if (!ExtensionManagementUtility::isLoaded('media')) {
 			return array();
 		}
 		if (!($imageInformation['originalFile'] instanceof \TYPO3\CMS\Core\Resource\File)) {
 			return array();
 		}
-		$objectManager = \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
+		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$assetRepository = $objectManager->get('TYPO3\\CMS\\Media\\Domain\\Repository\\AssetRepository');
 
 		$asset = $assetRepository->findByUid($imageInformation['originalFile']->getUid());

@@ -27,7 +27,7 @@
  * The main class of fl_realurl_image
  *
  */
-class tx_flrealurlimage extends tslib_cObj {
+class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
 
 	private $IMAGE_conf = array(); // IMAGE-Object config
 	private $fl_conf = array(); // config.fl_realurl_image from setup.txt / TypoScript merged with IMAGE-Object.fl_realurl_image
@@ -64,7 +64,7 @@ class tx_flrealurlimage extends tslib_cObj {
 		// init - only for $this->createFileCache required
 		$this->fl_config = $GLOBALS['fl_realurl_image'];
 		// Path of the requested image
-		$path = str_replace(t3lib_div::getIndpEnv('TYPO3_SITE_URL'), '', t3lib_div::getIndpEnv('TYPO3_REQUEST_URL'));
+		$path = str_replace(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 		$path = trim($path, '/');
 		// look up in DB-table if there is a image stored for this realurl
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('image_path,tstamp,realurl_path,page_id', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', '', '', 1);
@@ -171,7 +171,7 @@ class tx_flrealurlimage extends tslib_cObj {
 		}
 
 		if(method_exists('t3lib_div', 'array_merge_recursive_overrule')) {
-			$global_conf = t3lib_div::array_merge_recursive_overrule($global_conf, $local_conf, FALSE, FALSE);
+			$global_conf = \TYPO3\CMS\Core\Utility\GeneralUtility::array_merge_recursive_overrule($global_conf, $local_conf, FALSE, FALSE);
 		} else {
 			t3lib_utility_Array::mergeRecursiveWithOverrule($global_conf, $local_conf, TRUE, FALSE);
 		}
@@ -672,8 +672,3 @@ class tx_flrealurlimage extends tslib_cObj {
 	}
 
 }
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/class.tx_flrealurlimage.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/class.tx_flrealurlimage.php']);
-}
-?>

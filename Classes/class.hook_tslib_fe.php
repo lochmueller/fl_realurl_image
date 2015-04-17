@@ -44,8 +44,3 @@ class hook_tslib_fe {
 	}
 
 }
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/class.hook_tslib_fe.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/fl_realurl_image/Classes/class.hook_tslib_fe.php']);
-}
-?>
