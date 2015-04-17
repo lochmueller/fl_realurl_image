@@ -273,7 +273,6 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 	 */
 	private function generateTextBase() {
 		// get info to image
-		$damInfo = $this->getDAMinfo();
 		$pageInfo = $this->getPAGEinfo();
 		$falInfo = $this->getFALInfo();
 		$falReferenceInfo = $this->getFALReferenceInfo();
@@ -299,11 +298,6 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 				case 'media':
 					if ($mediaInfo[$item] && strlen(trim($mediaInfo[$item]))) {
 						return trim($mediaInfo[$item]);
-					}
-					break;
-				case 'dam':
-					if ($damInfo[$item] && strlen(trim($damInfo[$item]))) {
-						return trim($damInfo[$item]);
 					}
 					break;
 				case 'ts':
@@ -371,28 +365,6 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		}
 		return array();
 
-	}
-
-	/**
-	 * get DAM info for the image in $this->image
-	 *
-	 * @param       nothing
-	 *
-	 * @return        array        info from DAM
-	 */
-	private function getDAMinfo() {
-		if ($this->image['origFile'] && \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('dam')) {
-			// get information for item from tx_dam
-			$items = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', 'tx_dam', '(file_name = "' . basename($this->image['origFile']) . '" AND file_path = "' . \TYPO3\CMS\Core\Utility\GeneralUtility::dirname($this->image['origFile']) . '/") ' . $this->enableFields('tx_dam') // $this->cObj = $this as we XCLASS cObj
-				. ' AND sys_language_uid=0');
-			// get language overlay
-			if ($GLOBALS['TSFE']->sys_language_content) {
-				$OLmode = ($GLOBALS['TSFE']->sys_language_mode == 'strict' ? 'hideNonTranslated' : '');
-				$items[0] = $GLOBALS['TSFE']->sys_page->getRecordOverlay('tx_dam', $items[0], $GLOBALS['TSFE']->sys_language_content, $OLmode);
-			}
-			$damInfo = $items[0];
-			return $damInfo;
-		}
 	}
 
 	/**
