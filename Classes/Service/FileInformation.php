@@ -6,6 +6,9 @@
  * @package    ...
  * @author     Tim Lochmüller <tim@fruit-lab.de>
  */
+
+namespace FRUIT\FlRealurlImage\Service;
+
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -16,7 +19,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * @subpackage ...
  * @author     Tim Lochmüller <tim@fruit-lab.de>
  */
-class Tx_FlRealurlImage_Service_FileInformation {
+class FileInformation {
 
 	/**
 	 * Get information from the fal record of the current rendering

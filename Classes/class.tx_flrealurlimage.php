@@ -329,11 +329,10 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 	}
 
 	/**
-	 * @return bool|Tx_FlRealurlImage_Service_FileInformation
+	 * @return \FRUIT\FlRealurlImage\Service\FileInformation
 	 */
 	protected function getFileInformation() {
-		require_once(t3lib_extMgm::extPath('fl_realurl_image', 'Classes/Service/FileInformation.php'));
-		return new Tx_FlRealurlImage_Service_FileInformation();
+		return new \FRUIT\FlRealurlImage\Service\FileInformation();
 	}
 
 	/**
