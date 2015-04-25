@@ -67,7 +67,7 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 	 */
 	public function showImage() {
 		// init - only for $this->createFileCache required
-		$this->fl_config = $GLOBALS['fl_realurl_image'];
+		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 		// Path of the requested image
 		$path = str_replace(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 		$path = trim($path, '/');
@@ -108,7 +108,9 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 				$info = getimagesize(PATH_site . $data['image_path']);
 				header('Content-Type: ' . $info['mime']);
 				header('Content-Length: ' . filesize(PATH_site . $data['image_path']));
-				if ($GLOBALS['fl_realurl_image']['cacheControl'] && $data['tstamp'] != 0) {
+
+				$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
+				if ($this->fl_config['cacheControl'] && $data['tstamp'] != 0) {
 					header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data['tstamp']) . ' GMT');
 				}
 				readfile(PATH_site . $data['image_path']);
@@ -181,7 +183,7 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		$this->fl_conf = $global_conf;
 
 		// fl_config
-		$this->fl_config = $GLOBALS['fl_realurl_image'];
+		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 
 		// image Array
 		$this->image = $image;
