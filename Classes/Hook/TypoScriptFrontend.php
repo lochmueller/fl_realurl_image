@@ -8,8 +8,7 @@
 
 namespace FRUIT\FlRealurlImage\Hook;
 
-use FRUIT\FlRealurlImage\RealUrlImage;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * TypoScriptFrontend Hook
@@ -27,7 +26,7 @@ class TypoScriptFrontend {
 	 * @return    void
 	 */
 	function checkImageDecode(&$params, &$ref) {
-		$realurlimage = new RealUrlImage();
+		$realurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
 		$realurlimage->showImage();
 	}
 }

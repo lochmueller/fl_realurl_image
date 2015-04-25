@@ -3,14 +3,15 @@
 
 namespace FRUIT\FlRealurlImage\Xclass;
 
-use FRUIT\FlRealurlImage\RealUrlImage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject;
 
 /**
  * Class ImageResource
  *
  * @package FRUIT\FlRealurlImage\Xclass
  */
-class ImageResource extends \TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject {
+class ImageResource extends ImageResourceContentObject {
 
 	public function render($conf = array()) {
 		$GLOBALS['TSFE']->lastImgResourceInfo = $this->cObj->getImgResource($conf['file'], $conf['file.']);
@@ -20,7 +21,7 @@ class ImageResource extends \TYPO3\CMS\Frontend\ContentObject\ImageResourceConte
 		// ###################################
 		if (is_array($GLOBALS['TSFE']->lastImgResourceInfo)) {
 			// call fl_realurl_image to generate $new_fileName
-			$tx_flrealurlimage = new RealUrlImage();
+			$tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
 			$tx_flrealurlimage->start($this->data, $this->table);
 			$new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
 

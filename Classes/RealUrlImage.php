@@ -24,6 +24,8 @@
  * ************************************************************* */
 namespace FRUIT\FlRealurlImage;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * The main class of fl_realurl_image
  *
@@ -335,7 +337,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * @return \FRUIT\FlRealurlImage\Service\FileInformation
 	 */
 	protected function getFileInformation() {
-		return new \FRUIT\FlRealurlImage\Service\FileInformation();
+		return GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Service\\FileInformation');
 	}
 
 	/**

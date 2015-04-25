@@ -8,7 +8,10 @@
 
 namespace FRUIT\FlRealurlImage\Command;
 
-use TYPO3\CMS\Core\Database\DatabaseConnection;use TYPO3\CMS\Core\Messaging\FlashMessage;use TYPO3\CMS\Core\Utility\GeneralUtility;use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
+use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
  * Clean command controller
