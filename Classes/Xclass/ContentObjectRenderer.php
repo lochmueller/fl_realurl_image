@@ -26,9 +26,8 @@
 
 namespace FRUIT\FlRealurlImage\Xclass;
 
+use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-
-require_once(\t3lib_extMgm::extPath('fl_realurl_image') . 'Classes/class.tx_flrealurlimage.php');
 
 /**
  * Extends tslib_cObj to change the path for the images
@@ -52,7 +51,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
 		// ## Here begins RealUrl_image ######
 		// ###################################
 		// call fl_realurl_image to generate $new_fileName
-		$tx_flrealurlimage = new \tx_flrealurlimage();
+		$tx_flrealurlimage = new RealUrlImage();
 		$tx_flrealurlimage->start($this->data, $this->table);
 		$new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
 		$imageResource = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
@@ -112,7 +111,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
 			// ###################################
 			// ## Here begins RealUrl_image ######
 			// ###################################
-			$tx_flrealurlimage = new \tx_flrealurlimage();
+			$tx_flrealurlimage = new RealUrlImage();
 			$tx_flrealurlimage->start($this->data, $this->table);
 			$new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
 			$imageTagValues['src'] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;

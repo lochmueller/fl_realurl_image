@@ -22,12 +22,13 @@
  *
  *  This copyright notice MUST APPEAR in all copies of the script!
  * ************************************************************* */
+namespace FRUIT\FlRealurlImage;
 
 /**
  * The main class of fl_realurl_image
  *
  */
-class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
+class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
 
 	private $IMAGE_conf = array(); // IMAGE-Object config
 
@@ -589,7 +590,7 @@ class tx_flrealurlimage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectR
 		$new_folder = \TYPO3\CMS\Core\Utility\GeneralUtility::dirname($new_path);
 		if ($new_folder && !is_dir($new_folder)) {
 			if (!\TYPO3\CMS\Core\Utility\GeneralUtility::mkdir($new_folder)) {
-				throw new Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
+				throw new \Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
 			}
 		}
 		if (TYPO3_OS == 'WIN') {

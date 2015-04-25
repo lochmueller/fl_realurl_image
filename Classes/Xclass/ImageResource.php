@@ -3,6 +3,8 @@
 
 namespace FRUIT\FlRealurlImage\Xclass;
 
+use FRUIT\FlRealurlImage\RealUrlImage;
+
 /**
  * Class ImageResource
  *
@@ -18,8 +20,7 @@ class ImageResource extends \TYPO3\CMS\Frontend\ContentObject\ImageResourceConte
 		// ###################################
 		if (is_array($GLOBALS['TSFE']->lastImgResourceInfo)) {
 			// call fl_realurl_image to generate $new_fileName
-			require_once(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('fl_realurl_image') . 'Classes/class.tx_flrealurlimage.php');
-			$tx_flrealurlimage = new \tx_flrealurlimage();
+			$tx_flrealurlimage = new RealUrlImage();
 			$tx_flrealurlimage->start($this->data, $this->table);
 			$new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
 

@@ -8,6 +8,7 @@
 
 namespace FRUIT\FlRealurlImage\Hook;
 
+use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
@@ -15,7 +16,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
  *
  * @author Tim Lochmüller
  */
-
 class TypoScriptFrontend {
 
 	/**
@@ -27,9 +27,7 @@ class TypoScriptFrontend {
 	 * @return    void
 	 */
 	function checkImageDecode(&$params, &$ref) {
-
-		require_once(ExtensionManagementUtility::extPath('fl_realurl_image') . 'Classes/class.tx_flrealurlimage.php');
-		$tx_flrealurlimage = new \tx_flrealurlimage();
-		$tx_flrealurlimage->showImage();
+		$realurlimage = new RealUrlImage();
+		$realurlimage->showImage();
 	}
 }
