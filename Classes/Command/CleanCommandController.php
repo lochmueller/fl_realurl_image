@@ -8,11 +8,7 @@
 
 namespace FRUIT\FlRealurlImage\Command;
 
-use TYPO3\CMS\Core\Database\DatabaseConnection;
-use TYPO3\CMS\Core\Messaging\FlashMessage;
-use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
+use TYPO3\CMS\Core\Database\DatabaseConnection;use TYPO3\CMS\Core\Messaging\FlashMessage;use TYPO3\CMS\Core\Utility\GeneralUtility;use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 /**
  * Clean command controller
@@ -26,10 +22,9 @@ class CleanCommandController extends CommandController {
 	 */
 	public function removeDoubleEntriesCommand() {
 		$database = $this->getDatabase();
-		$sql = "SELECT COUNT(*) c, image_path FROM  tx_flrealurlimage_cache GROUP BY image_path ORDER BY c DESC LIMIT 0, 20";
-		$res = $database->sql_query($sql);
+		$rows = $database->exec_SELECTgetRows('COUNT(*) c, image_path', 'tx_flrealurlimage_cache', '1=1', 'image_path', 'c', '0, 20');
 
-		while ($row = $database->sql_fetch_assoc($res)) {
+		foreach ($rows as $row) {
 			if ($row['c'] > 1) {
 				$rows = $database->exec_SELECTgetRows('*', 'tx_flrealurlimage_cache', 'image_path="' . $row['image_path'] . '"', '', 'crdate ASC', $row['c'] - 1);
 				$ids = array();
@@ -42,7 +37,10 @@ class CleanCommandController extends CommandController {
 				$msg = 'Found ' . $row['c'] . ' of "' . $row['image_path'] . '"-path and delete ' . sizeof($ids) . ' entries.';
 				/** @var FlashMessage $message */
 				$message = GeneralUtility::makeInstance('t3lib_FlashMessage', '', $msg, FlashMessage::INFO);
-				FlashMessageQueue::addMessage($message);
+				/** @var $flashMessageService \TYPO3\CMS\Core\Messaging\FlashMessageService */
+				$flashMessageService = GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Messaging\\FlashMessageService');
+				$flashMessageService->getMessageQueueByIdentifier()
+					->addMessage($message);
 			}
 		}
 	}
@@ -52,9 +50,8 @@ class CleanCommandController extends CommandController {
 	 */
 	protected function checkImagePath() {
 		$database = $this->getDatabase();
-		$sql = "SELECT uid,image_path FROM tx_flrealurlimage_cache";
-		$res = $database->sql_query($sql);
-		while ($row = $database->sql_fetch_assoc($res)) {
+		$rows = $database->exec_SELECTgetRows(' uid,image_path', 'tx_flrealurlimage_cache', '1=1');
+		foreach ($rows as $row) {
 			if (!is_file(PATH_site . $row['image_path'])) {
 				echo $row['image_path'] . ' -- ' . $row['uid'] . '<br />';
 			}
