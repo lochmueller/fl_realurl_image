@@ -2,14 +2,16 @@ ChangeLog
 ---------
 
 
-3.5.0
+3.5.0 May 03, 2015
 
-- First TYPO3 6.2/7.1.x Release
+- First TYPO3 6.2/7.2.x Release
 - Remove DAM Support
 - Remove the obsolte media Support
 - Migration of all class names
 - Change class structure
 - Migration of the documentation
+- Cleanup the PHP classes
+- This Release is supported by bolius.dk! ThankYou!
 
 3.1.2 November 01, 2014
 

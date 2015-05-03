@@ -24,6 +24,3 @@ fl_realurl_image.conf_folder = typo3temp/fl_realurl_image
 
 # cat=plugin.fl_realurl_image/file/09; type=int; label=LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:fl_realurl_image.conf_hashLength
 fl_realurl_image.conf_hashLength = 2
-
-
-

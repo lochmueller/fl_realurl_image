@@ -10,21 +10,48 @@ namespace FRUIT\FlRealurlImage;
 
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\ArrayUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * The main class of fl_realurl_image
  */
-class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
+class RealUrlImage extends ContentObjectRenderer {
 
-	private $IMAGE_conf = array(); // IMAGE-Object config
+	/**
+	 * IMAGE-Object config
+	 *
+	 * @var array
+	 */
+	private $IMAGE_conf = array();
 
-	private $fl_conf = array(); // config.fl_realurl_image from setup.txt / TypoScript merged with IMAGE-Object.fl_realurl_image
+	/**
+	 * config.fl_realurl_image from setup.txt / TypoScript merged with IMAGE-Object.fl_realurl_image
+	 *
+	 * @var array
+	 */
+	private $fl_conf = array();
 
-	private $fl_config = array(); // config from ext_conf_template.txt  (install-tool)
+	/**
+	 * config from ext_conf_template.txt  (install-tool)
+	 *
+	 * @var array
+	 */
+	private $fl_config = array();
 
-	private $image = array(); // image Array of Typo3
+	/**
+	 * image Array of Typo3
+	 *
+	 * @var array
+	 */
+	private $image = array();
 
-	private $fileTypeInformation = array(); // info about the file type
+	/**
+	 * info about the file type
+	 *
+	 * @var array
+	 */
+	private $fileTypeInformation = array();
 
 	/*
 	  - 0: Height
@@ -53,16 +80,17 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * @return void
 	 */
 	public function showImage() {
+		$database = $this->getDatabaseConnection();
 		// init - only for $this->createFileCache required
 		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 		// Path of the requested image
 		$path = str_replace(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 		$path = trim($path, '/');
 		// look up in DB-table if there is a image stored for this realurl
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('image_path,tstamp,realurl_path,page_id', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', '', '', 1);
-		if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) > 0) {
+		$res = $database->exec_SELECTquery('image_path,tstamp,realurl_path,page_id', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', '', '', 1);
+		if ($database->sql_num_rows($res) > 0) {
 			// get the information to the requested image
-			$data = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+			$data = $database->sql_fetch_assoc($res);
 			// update DB to idicate that image was requested
 			if (!strstr($data['page_id'], '?')) {
 				$page_id = trim($data['page_id'] . ',?', ',');
@@ -75,7 +103,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				'page_id' => $page_id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', $insertArray);
+			$database->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', $insertArray);
 			// linkStatic is switched on, then relink the image static.
 			// The obviously lost image will be shown much faster next time
 			if ($this->fl_config['fileLinks']) {
@@ -166,7 +194,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 			$local_conf = $conf['fl_realurl_image.'];
 		}
 
-		$global_conf = \TYPO3\CMS\Extbase\Utility\ArrayUtility::arrayMergeRecursiveOverrule($global_conf, $local_conf);
+		$global_conf = ArrayUtility::arrayMergeRecursiveOverrule($global_conf, $local_conf);
 
 
 		$this->fl_conf = $global_conf;

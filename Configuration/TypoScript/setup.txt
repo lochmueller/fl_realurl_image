@@ -15,4 +15,3 @@ config.fl_realurl_image {
 	folder = {$fl_realurl_image.conf_folder}
 	hashLength = {$fl_realurl_image.conf_hashLength}
 }
-
