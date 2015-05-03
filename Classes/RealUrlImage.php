@@ -1,34 +1,18 @@
 <?php
 
-/* * *************************************************************
- *  Copyright notice
+/**
+ * Main class
  *
- *  (c) 2011 Tim Lochmueller, Sareen Millet, Dr. Ronald Steiner
- *  All rights reserved
- *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- * ************************************************************* */
+ * @author Tim Lochmüller
+ */
+
 namespace FRUIT\FlRealurlImage;
 
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * The main class of fl_realurl_image
- *
  */
 class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer {
 
@@ -378,7 +362,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * - pass through rawurlencode()
 	 * Works with the character set defined as "forceCharset"
 	 *
-	 * @param       string    $textBase    a text string to encode into a nice file name
+	 * @param       string $textBase a text string to encode into a nice file name
 	 *
 	 * @return      string      Encoded text string
 	 * @see rootLineToPath()
@@ -413,7 +397,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	/**
 	 * add a very simple Hash to $textBase
 	 *
-	 * @param        string    $textBase    Text base: e.g. typo3temp/fl_realurl_image/myimage-name
+	 * @param        string $textBase Text base: e.g. typo3temp/fl_realurl_image/myimage-name
 	 *
 	 * @return        string        Text base: e.g. typo3temp/fl_realurl_image/myimage-name-a7r
 	 */
@@ -487,14 +471,15 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	/**
 	 * Writes in the DB - if not taken
 	 *
-	 * @param        string  $new_fileName      the path to write in the DB
+	 * @param        string $new_fileName the path to write in the DB
 	 *
 	 * @return        boolean        successfull?
 	 */
 	private function writeDB($new_fileName) {
-		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'');
-		$num = $GLOBALS['TYPO3_DB']->sql_num_rows($res);
-		$data = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
+		$database = $this->getDatabaseConnection();
+		$res = $database->exec_SELECTquery('*', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'');
+		$num = $database->sql_num_rows($res);
+		$data = $database->sql_fetch_assoc($res);
 		// the requested path is free up to now
 		if ($num == 0) {
 			$insertArray = array(
@@ -511,7 +496,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				'page_id'      => $GLOBALS['TSFE']->id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_flrealurlimage_cache', $insertArray);
+			$database->exec_INSERTquery('tx_flrealurlimage_cache', $insertArray);
 			return TRUE;
 		} // requested path already taken by this picture
 		elseif ($num == 1 && $data['image_path'] == $this->org_fileName) {
@@ -528,7 +513,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				'page_id' => $page_id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'', $insertArray);
+			$database->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'', $insertArray);
 			return TRUE;
 		} // requested path already reserved for another picture
 		else {
@@ -541,8 +526,8 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * if it is different from the original image.
 	 * A new, different image has to take this place later and will carie it's name
 	 *
-	 * @param        string    $org_path    the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
-	 * @param        string    $new_path    the path to the new image
+	 * @param        string $org_path the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
+	 * @param        string $new_path the path to the new image
 	 *
 	 * @return      NULL
 	 */
@@ -620,7 +605,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	/**
 	 * Removing a part from the path
 	 *
-	 * @param        string   $path     the path
+	 * @param        string $path the path
 	 *
 	 * @return        string      the path after removing
 	 */
@@ -630,6 +615,15 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 		} else {
 			return $path;
 		}
+	}
+
+	/**
+	 * Get the database connection
+	 *
+	 * @return DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
 	}
 
 }

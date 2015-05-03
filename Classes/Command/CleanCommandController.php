@@ -2,7 +2,6 @@
 /**
  * Clean command controller
  *
- * @package FlRealurlImage\Command
  * @author  Tim Lochmüller
  */
 

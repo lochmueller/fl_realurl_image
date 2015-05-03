@@ -1,10 +1,8 @@
 <?php
 /**
- * @todo       General file information
+ * File information service
  *
- * @category   Extension
- * @package    ...
- * @author     Tim Lochmüller <tim@fruit-lab.de>
+ * @author Tim Lochmüller
  */
 
 namespace FRUIT\FlRealurlImage\Service;
@@ -12,16 +10,12 @@ namespace FRUIT\FlRealurlImage\Service;
 use FRUIT\FlRealurlImage\Xclass\ContentObjectRenderer;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
- * @todo       General class information
+ * File information service
  *
- * @package    ...
- * @subpackage ...
- * @author     Tim Lochmüller <tim@fruit-lab.de>
+ * @author Tim Lochmüller
  */
 class FileInformation {
 
@@ -83,6 +77,6 @@ class FileInformation {
 		}
 
 		return array();
-	} 
+	}
 
 } 

@@ -2,7 +2,6 @@
 /**
  * TypoScriptFrontend Hook
  *
- * @package ...
  * @author  Tim Lochmüller
  */
 

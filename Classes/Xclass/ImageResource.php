@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * ImageResource Xclass
+ *
+ * @author Tim Lochmüller
+ */
 
 namespace FRUIT\FlRealurlImage\Xclass;
 
@@ -14,6 +19,8 @@ use TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject;
 class ImageResource extends ImageResourceContentObject {
 
 	/**
+	 * Overwrite render method
+	 *
 	 * @param array $conf
 	 *
 	 * @return string
