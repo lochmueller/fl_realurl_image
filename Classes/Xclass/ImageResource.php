@@ -13,6 +13,11 @@ use TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject;
  */
 class ImageResource extends ImageResourceContentObject {
 
+	/**
+	 * @param array $conf
+	 *
+	 * @return string
+	 */
 	public function render($conf = array()) {
 		$GLOBALS['TSFE']->lastImgResourceInfo = $this->cObj->getImgResource($conf['file'], $conf['file.']);
 

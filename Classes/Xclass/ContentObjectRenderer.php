@@ -26,7 +26,6 @@
 
 namespace FRUIT\FlRealurlImage\Xclass;
 
-use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -134,6 +133,8 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
 			}
 			return $theValue;
 		}
+
+		return parent::cImage($file, $conf);
 	}
 
 	/**

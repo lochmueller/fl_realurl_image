@@ -9,8 +9,12 @@
 
 namespace FRUIT\FlRealurlImage\Service;
 
+use FRUIT\FlRealurlImage\Xclass\ContentObjectRenderer;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 
 /**
  * @todo       General class information
@@ -29,7 +33,7 @@ class FileInformation {
 	 * @return array
 	 */
 	public function getByFal($imageInformation) {
-		if ($imageInformation['originalFile'] instanceof \TYPO3\CMS\Core\Resource\File) {
+		if ($imageInformation['originalFile'] instanceof File) {
 			return $imageInformation['originalFile']->getProperties();
 		}
 		return array();
@@ -47,12 +51,12 @@ class FileInformation {
 	 * @return array
 	 */
 	public function getByFalReference($imageInformation, $file, $conf, $cObj) {
-		if (!($cObj instanceof \FRUIT\FlRealurlImage\Xclass\ContentObjectRenderer)) {
+		if (!($cObj instanceof ContentObjectRenderer)) {
 			return array();
 		}
 		$fileReference = NULL;
 		$fileArray = $conf['file.'];
-		if ($file instanceof \TYPO3\CMS\Core\Resource\FileReference) {
+		if ($file instanceof FileReference) {
 			$fileReference = $file;
 		} else {
 			try {
@@ -63,7 +67,7 @@ class FileInformation {
 					}
 				}
 
-				if (\TYPO3\CMS\Core\Utility\MathUtility::canBeInterpretedAsInteger($file)) {
+				if (MathUtility::canBeInterpretedAsInteger($file)) {
 					if (!empty($fileArray['treatIdAsReference'])) {
 						$fileReference = $cObj->getRFactory()
 							->getFileReferenceObject($file);
@@ -74,7 +78,7 @@ class FileInformation {
 			}
 		}
 
-		if ($fileReference instanceof \TYPO3\CMS\Core\Resource\FileReference) {
+		if ($fileReference instanceof FileReference) {
 			return $fileReference->getProperties();
 		}
 
@@ -96,7 +100,7 @@ class FileInformation {
 		if (!ExtensionManagementUtility::isLoaded('media')) {
 			return array();
 		}
-		if (!($imageInformation['originalFile'] instanceof \TYPO3\CMS\Core\Resource\File)) {
+		if (!($imageInformation['originalFile'] instanceof File)) {
 			return array();
 		}
 		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');

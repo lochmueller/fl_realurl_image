@@ -72,7 +72,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 		// init - only for $this->createFileCache required
 		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 		// Path of the requested image
-		$path = str_replace(\TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', \TYPO3\CMS\Core\Utility\GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
+		$path = str_replace(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 		$path = trim($path, '/');
 		// look up in DB-table if there is a image stored for this realurl
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('image_path,tstamp,realurl_path,page_id', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', '', '', 1);
@@ -91,7 +91,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				'page_id' => $page_id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', $insertArray);
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', $insertArray);
 			// linkStatic is switched on, then relink the image static.
 			// The obviously lost image will be shown much faster next time
 			if ($this->fl_config['fileLinks']) {
@@ -141,6 +141,8 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * @param array $info image info array:
 	 * @param mixed $file
 	 *
+	 * @param null  $cObj
+	 *
 	 * @return string
 	 */
 	public function main($conf, $info, $file = NULL, $cObj = NULL) {
@@ -163,7 +165,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * @param array $image image info array:
 	 * @param mixed $file
 	 *
-	 * @return
+	 * @param       $cObj
 	 */
 	private function init($conf, $image, $file, $cObj) {
 		// IMAGE_conf
@@ -217,7 +219,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 		}
 
 		// org_fileName
-		$this->org_fileName = htmlspecialchars(trim(\TYPO3\CMS\Core\Utility\GeneralUtility::rawUrlEncodeFP($image[3])));
+		$this->org_fileName = htmlspecialchars(trim(GeneralUtility::rawUrlEncodeFP($image[3])));
 	}
 
 	/**
@@ -284,10 +286,10 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 		$mediaInfo = $this->getMEDIAInfo();
 
 		// walk the options until a possible base for a file-name is found
-		$parts = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode('//', $this->fl_conf['data'], TRUE);
+		$parts = GeneralUtility::trimExplode('//', $this->fl_conf['data'], TRUE);
 		$partSize = sizeof($parts);
 		for ($i = 0; $i < $partSize; $i++) {
-			list($source, $item) = \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode(':', $parts[$i], TRUE);
+			list($source, $item) = GeneralUtility::trimExplode(':', $parts[$i], TRUE);
 
 			switch ($source) {
 				case 'falref':
@@ -393,7 +395,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * - pass through rawurlencode()
 	 * Works with the character set defined as "forceCharset"
 	 *
-	 * @param       string        a text string to encode into a nice file name
+	 * @param       string    $textBase    a text string to encode into a nice file name
 	 *
 	 * @return      string      Encoded text string
 	 * @see rootLineToPath()
@@ -428,7 +430,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	/**
 	 * add a very simple Hash to $textBase
 	 *
-	 * @param        string        Text base: e.g. typo3temp/fl_realurl_image/myimage-name
+	 * @param        string    $textBase    Text base: e.g. typo3temp/fl_realurl_image/myimage-name
 	 *
 	 * @return        string        Text base: e.g. typo3temp/fl_realurl_image/myimage-name-a7r
 	 */
@@ -438,7 +440,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 
 		$hashBase = $org_base;
 		if (isset($this->image[3]) && strlen($this->image[3])) {
-			$hashBase = \TYPO3\CMS\Core\Utility\GeneralUtility::shortMD5($this->image[3], 24);
+			$hashBase = GeneralUtility::shortMD5($this->image[3], 24);
 		}
 		$hashLength = isset($this->fl_conf['hashLength']) ? (int)$this->fl_conf['hashLength'] : 0;
 
@@ -468,9 +470,9 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * Writes $textBase in the fl_realurl_image_cache table
 	 * arter collissions handling
 	 *
-	 * @param        string        the path of the new image
+	 * @param string $textBase the path of the new image
 	 *
-	 * @return        string        the path of the new image after collision handling
+	 * @return string|NULL the path of the new image after collision handling
 	 */
 	private function writeDBcollisionHandling($textBase) {
 		list($trunk, $ending) = explode('.', $textBase);
@@ -496,12 +498,13 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				}
 			}
 		}
+		return NULL;
 	}
 
 	/**
 	 * Writes in the DB - if not taken
 	 *
-	 * @param        string        the path to write in the DB
+	 * @param        string  $new_fileName      the path to write in the DB
 	 *
 	 * @return        boolean        successfull?
 	 */
@@ -525,7 +528,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				'page_id'      => $GLOBALS['TSFE']->id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$res = $GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_flrealurlimage_cache', $insertArray);
+			$GLOBALS['TYPO3_DB']->exec_INSERTquery('tx_flrealurlimage_cache', $insertArray);
 			return TRUE;
 		} // requested path already taken by this picture
 		elseif ($num == 1 && $data['image_path'] == $this->org_fileName) {
@@ -542,7 +545,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				'page_id' => $page_id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'', $insertArray);
+			$GLOBALS['TYPO3_DB']->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'', $insertArray);
 			return TRUE;
 		} // requested path already reserved for another picture
 		else {
@@ -555,10 +558,10 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * if it is different from the original image.
 	 * A new, different image has to take this place later and will carie it's name
 	 *
-	 * @param        string        the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
-	 * @param        string        the path to the new image
+	 * @param        string    $org_path    the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
+	 * @param        string    $new_path    the path to the new image
 	 *
-	 * @return      nothing
+	 * @return      NULL
 	 */
 	private function deleteFileCache($org_path, $new_path) {
 		if (TYPO3_OS == 'WIN') {
@@ -579,7 +582,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	 * @param string $org_path the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
 	 * @param string $new_path the path to the new image
 	 *
-	 * @return void
+	 * @throws \Exception
 	 */
 	private function createFileCache($org_path, $new_path) {
 
@@ -589,9 +592,9 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 		}
 
 		// create folder if required
-		$new_folder = \TYPO3\CMS\Core\Utility\GeneralUtility::dirname($new_path);
+		$new_folder = GeneralUtility::dirname($new_path);
 		if ($new_folder && !is_dir($new_folder)) {
-			if (!\TYPO3\CMS\Core\Utility\GeneralUtility::mkdir($new_folder)) {
+			if (!GeneralUtility::mkdir($new_folder)) {
 				throw new \Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
 			}
 		}
@@ -634,7 +637,7 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 	/**
 	 * Removing a part from the path
 	 *
-	 * @param        string        the path
+	 * @param        string   $path     the path
 	 *
 	 * @return        string      the path after removing
 	 */

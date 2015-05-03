@@ -1,5 +1,7 @@
 <?php
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+
 if (!defined('TYPO3_MODE')) {
 	die('Access denied.');
 }
@@ -11,8 +13,8 @@ return array(
 		'tstamp'            => 'tstamp',
 		'crdate'            => 'crdate',
 		'rootLevel'         => 1,
-		'dynamicConfigFile' => t3lib_extMgm::extPath('fl_realurl_image') . 'Configuration/TCA/Cache.php',
-		'iconfile'          => t3lib_extMgm::extRelPath('fl_realurl_image') . 'ext_icon.gif',
+		'dynamicConfigFile' => ExtensionManagementUtility::extPath('fl_realurl_image') . 'Configuration/TCA/Cache.php',
+		'iconfile'          => ExtensionManagementUtility::extRelPath('fl_realurl_image') . 'ext_icon.gif',
 	),
 	'interface'   => Array(
 		'showRecordFieldList' => ''
