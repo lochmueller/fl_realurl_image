@@ -2,7 +2,7 @@ ChangeLog
 ---------
 
 
-3.5.0 May 03, 2015
+3.2.0 May 03, 2015
 
 - First TYPO3 6.2/7.2.x Release
 - Remove DAM Support
