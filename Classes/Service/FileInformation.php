@@ -83,35 +83,6 @@ class FileInformation {
 		}
 
 		return array();
-	}
-
-	/**
-	 * Get information about the media record including langauge overlay of the curent rendering
-	 *
-	 * @param $imageInformation
-	 *
-	 * @return array
-	 * @deprected
-	 */
-	public function getByMedia($imageInformation) {
-		return array();
-		// the AssetRepository do not exists anymore
-
-		if (!ExtensionManagementUtility::isLoaded('media')) {
-			return array();
-		}
-		if (!($imageInformation['originalFile'] instanceof File)) {
-			return array();
-		}
-		$objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-		$assetRepository = $objectManager->get('TYPO3\\CMS\\Media\\Domain\\Repository\\AssetRepository');
-
-		$asset = $assetRepository->findByUid($imageInformation['originalFile']->getUid());
-		if (is_object($asset)) {
-			return $asset->getProperties();
-		}
-		return array();
-
-	}
+	} 
 
 } 

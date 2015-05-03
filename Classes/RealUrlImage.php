@@ -283,7 +283,6 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 		$pageInfo = $this->getPAGEinfo();
 		$falInfo = $this->getFALInfo();
 		$falReferenceInfo = $this->getFALReferenceInfo();
-		$mediaInfo = $this->getMEDIAInfo();
 
 		// walk the options until a possible base for a file-name is found
 		$parts = GeneralUtility::trimExplode('//', $this->fl_conf['data'], TRUE);
@@ -300,11 +299,6 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 				case 'fal':
 					if ($falInfo[$item] && strlen(trim($falInfo[$item]))) {
 						return trim($falInfo[$item]);
-					}
-					break;
-				case 'media':
-					if ($mediaInfo[$item] && strlen(trim($mediaInfo[$item]))) {
-						return trim($mediaInfo[$item]);
 					}
 					break;
 				case 'ts':
@@ -360,17 +354,6 @@ class RealUrlImage extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRender
 			return $fileInformation->getByFal($this->image);
 		}
 		return array();
-	}
-
-	/**
-	 * @return array
-	 */
-	protected function getMEDIAInfo() {
-		if ($fileInformation = $this->getFileInformation()) {
-			return $fileInformation->getByMedia($this->image);
-		}
-		return array();
-
 	}
 
 	/**

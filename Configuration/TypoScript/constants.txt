@@ -2,7 +2,7 @@
 fl_realurl_image.conf_enable = 1
 
 # cat=plugin.fl_realurl_image/file/02; type=string; label=LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:fl_realurl_image.conf_data
-fl_realurl_image.conf_data = media:title // falref:title // fal:title // ts:altText // file:origFile // page:title // image
+fl_realurl_image.conf_data = falref:title // fal:title // ts:altText // file:origFile // page:title // image
 
 # cat=plugin.fl_realurl_image/file/03; type=options[lower,upper,none]; label=LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:fl_realurl_image.conf_case
 fl_realurl_image.conf_case = lower
