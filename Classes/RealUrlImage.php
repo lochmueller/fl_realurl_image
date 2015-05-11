@@ -33,13 +33,6 @@ class RealUrlImage extends ContentObjectRenderer {
 	private $fl_conf = array();
 
 	/**
-	 * config from ext_conf_template.txt  (install-tool)
-	 *
-	 * @var array
-	 */
-	private $fl_config = array();
-
-	/**
 	 * image Array of Typo3
 	 *
 	 * @var array
@@ -93,8 +86,6 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return void
 	 */
 	public function showImage() {
-		// init - only for $this->createFileCache required
-		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 		// Path of the requested image
 		$path = str_replace(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 		$path = trim($path, '/');
@@ -134,8 +125,6 @@ class RealUrlImage extends ContentObjectRenderer {
 				$info = getimagesize(PATH_site . $data['image_path']);
 				header('Content-Type: ' . $info['mime']);
 				header('Content-Length: ' . filesize(PATH_site . $data['image_path']));
-
-				$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 				if ($this->configuration->get('cacheControl') && $data['tstamp'] != 0) {
 					header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data['tstamp']) . ' GMT');
 				}
@@ -207,11 +196,7 @@ class RealUrlImage extends ContentObjectRenderer {
 
 		$global_conf = ArrayUtility::arrayMergeRecursiveOverrule($global_conf, $local_conf);
 
-
 		$this->fl_conf = $global_conf;
-
-		// fl_config
-		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 
 		// image Array
 		$this->image = $image;
