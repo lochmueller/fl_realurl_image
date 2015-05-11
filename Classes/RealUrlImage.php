@@ -10,6 +10,7 @@ namespace FRUIT\FlRealurlImage;
 
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -86,24 +87,23 @@ class RealUrlImage extends ContentObjectRenderer {
 		// Path of the requested image
 		$path = str_replace(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
 		$path = trim($path, '/');
+		$cacheIdentifier = $path;
 		// look up in DB-table if there is a image stored for this realurl
-		$res = $database->exec_SELECTquery('image_path,tstamp,realurl_path,page_id', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', '', '', 1);
-		if ($database->sql_num_rows($res) > 0) {
+		$cache = $this->getCache();
+		if ($cache->has($cacheIdentifier)) {
 			// get the information to the requested image
-			$data = $database->sql_fetch_assoc($res);
+			$data = unserialize($cache->get($cacheIdentifier));
 			// update DB to idicate that image was requested
 			if (!strstr($data['page_id'], '?')) {
 				$page_id = trim($data['page_id'] . ',?', ',');
 			} else {
 				$page_id = trim($data['page_id'], ',');
 			}
-			$insertArray = array(
-				'tstamp'  => time(),
-				// image link last requestet on
-				'page_id' => $page_id
-				// comma seperated list of pid's where the image has been requested from
-			);
-			$database->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $path . '\'', $insertArray);
+			$data['tstamp'] = time();
+			$data['page_id'] = $page_id;
+
+			$cache->set($cacheIdentifier, serialize($data));
+
 			// linkStatic is switched on, then relink the image static.
 			// The obviously lost image will be shown much faster next time
 			if ($this->fl_config['fileLinks']) {
@@ -505,11 +505,22 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	private function writeDB($new_fileName) {
 		$database = $this->getDatabaseConnection();
-		$res = $database->exec_SELECTquery('*', 'tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'');
-		$num = $database->sql_num_rows($res);
-		$data = $database->sql_fetch_assoc($res);
-		// the requested path is free up to now
-		if ($num == 0) {
+
+		$cache = $this->getCache();
+		if ($cache->has($new_fileName)) {
+			$data = unserialize($cache->get($new_fileName));
+			$pids = explode(',', $data['page_id']);
+			if (!in_array($GLOBALS['TSFE']->id, $pids)) {
+				$page_id = trim($data['page_id'] . ',' . $GLOBALS['TSFE']->id, ',');
+			} else {
+				$page_id = trim($data['page_id'], ',');
+			}
+			// insert in DB
+			$data['tstamp'] = time();
+			$data['page_id'] = $page_id;
+
+			$cache->set($new_fileName, serialize($data));
+		} else {
 			$insertArray = array(
 				'crdate'       => time(),
 				// image link first created at
@@ -524,29 +535,11 @@ class RealUrlImage extends ContentObjectRenderer {
 				'page_id'      => $GLOBALS['TSFE']->id
 				// comma seperated list of pid's where the image has been requested from
 			);
-			$database->exec_INSERTquery('tx_flrealurlimage_cache', $insertArray);
+
+			$cache->set($new_fileName, serialize($insertArray));
 			return TRUE;
-		} // requested path already taken by this picture
-		elseif ($num == 1 && $data['image_path'] == $this->org_fileName) {
-			$pids = explode(',', $data['page_id']);
-			if (!in_array($GLOBALS['TSFE']->id, $pids)) {
-				$page_id = trim($data['page_id'] . ',' . $GLOBALS['TSFE']->id, ',');
-			} else {
-				$page_id = trim($data['page_id'], ',');
-			}
-			// insert in DB
-			$insertArray = array(
-				'tstamp'  => time(),
-				// image link last requestet on
-				'page_id' => $page_id
-				// comma seperated list of pid's where the image has been requested from
-			);
-			$database->exec_UPDATEquery('tx_flrealurlimage_cache', 'realurl_path=\'' . $new_fileName . '\'', $insertArray);
-			return TRUE;
-		} // requested path already reserved for another picture
-		else {
-			return FALSE;
 		}
+		return TRUE;
 	}
 
 	/**
@@ -652,6 +645,24 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	protected function getDatabaseConnection() {
 		return $GLOBALS['TYPO3_DB'];
+	}
+
+	/**
+	 * Get the static file cache
+	 *
+	 * @return \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+	 * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
+	 */
+	protected function getCache() {
+		static $cache = NULL;
+		if ($cache !== NULL) {
+			return $cache;
+		}
+		/** @var \TYPO3\CMS\Core\Cache\CacheManager $cacheManager */
+		$objectManager = new ObjectManager();
+		$cacheManager = $objectManager->get('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+		$cache = $cacheManager->getCache('fl_realurl_image');
+		return $cache;
 	}
 
 }
