@@ -349,7 +349,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	protected function getFALReferenceInfo() {
 		if ($fileInformation = $this->getFileInformation()) {
-			return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf, $this->cObj);
+			return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf, $GLOBALS['TSFE']->cObj);
 		}
 		return array();
 	}
@@ -394,6 +394,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	private function smartEncoding($textBase) {
 		// decode $textBase
 		$textBase = urldecode($textBase);
+
 		// stdWrap
 		$textBase = $this->stdWrap($textBase, $this->fl_conf);
 		// Convert some special tokens to the space character:
@@ -640,6 +641,17 @@ class RealUrlImage extends ContentObjectRenderer {
 		$cacheManager = $objectManager->get('TYPO3\\CMS\\Core\\Cache\\CacheManager');
 		$cache = $cacheManager->getCache('fl_realurl_image');
 		return $cache;
+	}
+
+	/**
+	 * @param $textBase
+	 * @param $fl_conf
+	 *
+	 * @return string
+	 */
+	public function stdWrapDummy($textBase, $fl_conf) {
+		$objectContentRender = new ContentObjectRenderer();
+		return $objectContentRender->stdWrap($textBase, $this->fl_conf);
 	}
 
 }
