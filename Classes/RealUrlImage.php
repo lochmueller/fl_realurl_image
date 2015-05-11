@@ -8,7 +8,6 @@
 
 namespace FRUIT\FlRealurlImage;
 
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
@@ -70,6 +69,19 @@ class RealUrlImage extends ContentObjectRenderer {
 	private $enable = TRUE;
 
 	/**
+	 * @var Configuration
+	 */
+	protected $configuration = NULL;
+
+	/**
+	 * Build up the object
+	 */
+	public function __construct() {
+		$objectManager = new ObjectManager();
+		$this->configuration = $objectManager->get('FRUIT\\FlRealurlImage\\Configuration');
+	}
+
+	/**
 	 * Outputting the image that fits to the realurl_image request
 	 * Notice: normally the image should be in the static file cache
 	 * ... so this is an emergency action only when no image is in static file cache
@@ -81,7 +93,6 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return void
 	 */
 	public function showImage() {
-		$database = $this->getDatabaseConnection();
 		// init - only for $this->createFileCache required
 		$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
 		// Path of the requested image
@@ -106,12 +117,12 @@ class RealUrlImage extends ContentObjectRenderer {
 
 			// linkStatic is switched on, then relink the image static.
 			// The obviously lost image will be shown much faster next time
-			if ($this->fl_config['fileLinks']) {
+			if ($this->configuration->get('fileLinks')) {
 				$this->createFileCache($data['image_path'], $data['realurl_path']);
 			}
 			// cacheControl is switched on and the image has not been modified since last request
 			// => loaded from browser cache 
-			if ($this->fl_config['cacheControl'] && $_SERVER['HTTP_IF_MODIFIED_SINCE']) {
+			if ($this->configuration->get('cacheControl') && $_SERVER['HTTP_IF_MODIFIED_SINCE']) {
 				$lastGet = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
 				if ($data['tstamp'] != 0 && $lastGet <= $data['tstamp']) {
 					header('HTTP/1.1 304 Not Modified');
@@ -125,7 +136,7 @@ class RealUrlImage extends ContentObjectRenderer {
 				header('Content-Length: ' . filesize(PATH_site . $data['image_path']));
 
 				$this->fl_config = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
-				if ($this->fl_config['cacheControl'] && $data['tstamp'] != 0) {
+				if ($this->configuration->get('cacheControl') && $data['tstamp'] != 0) {
 					header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data['tstamp']) . ' GMT');
 				}
 				readfile(PATH_site . $data['image_path']);
@@ -504,7 +515,6 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return        boolean        successfull?
 	 */
 	private function writeDB($new_fileName) {
-		$database = $this->getDatabaseConnection();
 
 		$cache = $this->getCache();
 		if ($cache->has($new_fileName)) {
@@ -518,27 +528,19 @@ class RealUrlImage extends ContentObjectRenderer {
 			// insert in DB
 			$data['tstamp'] = time();
 			$data['page_id'] = $page_id;
-
-			$cache->set($new_fileName, serialize($data));
 		} else {
-			$insertArray = array(
-				'crdate'       => time(),
+			$data = array(
+				'crdate'     => time(),
 				// image link first created at
-				'pid'          => intval($this->fl_config['storagePid']),
-				// pid of the storage folder where the Typo3 list modul will find the DB enties
-				'tstamp'       => time(),
+				'tstamp'     => time(),
 				// image link last requestet on
-				'image_path'   => $this->org_fileName,
+				'image_path' => $this->org_fileName,
 				// path to the original image
-				'realurl_path' => $new_fileName,
-				// path to the new image (link)
-				'page_id'      => $GLOBALS['TSFE']->id
+				'page_id'    => $GLOBALS['TSFE']->id
 				// comma seperated list of pid's where the image has been requested from
 			);
-
-			$cache->set($new_fileName, serialize($insertArray));
-			return TRUE;
 		}
+		$cache->set($new_fileName, serialize($data));
 		return TRUE;
 	}
 
@@ -592,10 +594,10 @@ class RealUrlImage extends ContentObjectRenderer {
 				return;
 			}
 			// no copy
-			if ($this->fl_config['fileLinks'] == 'none') {
+			if ($this->configuration->get('fileLinks') == 'none') {
 				return;
 			} // true copy
-			elseif ($this->fl_config['fileLinks'] == 'copy') {
+			elseif ($this->configuration->get('fileLinks') == 'copy') {
 				copy($org_path, $new_path);
 			} // symlink
 			// ... not possible in WIN => = hard-link
@@ -608,13 +610,13 @@ class RealUrlImage extends ContentObjectRenderer {
 				return;
 			}
 			// no copy
-			if ($this->fl_config['fileLinks'] == 'none') {
+			if ($this->configuration->get('fileLinks') == 'none') {
 				return;
 			} // true copy
-			elseif ($this->fl_config['fileLinks'] == 'copy') {
+			elseif ($this->configuration->get('fileLinks') == 'copy') {
 				copy(PATH_site . $org_path, PATH_site . $new_path);
 			} // symlink
-			elseif ($this->fl_config['fileLinks'] == 'symLink') {
+			elseif ($this->configuration->get('fileLinks') == 'symLink') {
 				symlink(PATH_site . $org_path, PATH_site . $new_path); // Secure for open_basedir restriction
 			} // hard-link
 			else {
@@ -631,20 +633,10 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return        string      the path after removing
 	 */
 	private function virtualPathRemove($path) {
-		if ($this->fl_config['virtualPathRemove']) {
-			return str_replace($this->fl_config['virtualPathRemove'], '', $path);
-		} else {
-			return $path;
+		if ($this->configuration->get('virtualPathRemove')) {
+			return str_replace($this->configuration->get('virtualPathRemove'), '', $path);
 		}
-	}
-
-	/**
-	 * Get the database connection
-	 *
-	 * @return DatabaseConnection
-	 */
-	protected function getDatabaseConnection() {
-		return $GLOBALS['TYPO3_DB'];
+		return $path;
 	}
 
 	/**

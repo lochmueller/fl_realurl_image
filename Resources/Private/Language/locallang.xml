@@ -12,7 +12,6 @@
 			<label index="fl_realurl_image.page_id">Page</label>
 			<label index="fl_realurl_image.crdate">Create date</label>
 			
-			<label index="fl_realurl_image.ext_conf_storagePid">storagePid: A typo3 pid where the image Datasets are stored.</label>
 			<label index="fl_realurl_image.ext_conf_cacheControl">cacheControl: Enable the Cache Control Feature to get a better performance, images will be loaded from browser cache</label>
 			<label index="fl_realurl_image.ext_conf_fileLinks">fileLinks: Chose which file links you desire, none, softLinks, hardLinks or ture copies. File links enables that images can be displayed with no need of DB-request as they really exist. A great deal for performance!</label>
 			<label index="fl_realurl_image.ext_conf_virtualPathRemove">virtualPathRemove: Virtually remove this segment from the image path. (Notice, this will only work if you set .htaccess accordingly)</label>

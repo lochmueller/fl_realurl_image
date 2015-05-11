@@ -19,9 +19,31 @@ class Configuration {
 	 *
 	 * @param string $name
 	 *
-	 * @todo implement central configuration handling
+	 * @return mixed|bool
 	 */
 	public function get($name) {
+		$extensionConfiguration = $this->getExtensionConfiguration();
+		if (isset($extensionConfiguration[$name])) {
+			return $extensionConfiguration[$name];
+		}
+		return FALSE;
+	}
+
+	/**
+	 * Get the extension configuration variables
+	 *
+	 * @return array|mixed
+	 */
+	protected function getExtensionConfiguration() {
+		static $extensionConfiguration = NULL;
+		if ($extensionConfiguration !== NULL) {
+			return $extensionConfiguration;
+		}
+		$extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
+		if (!is_array($extensionConfiguration)) {
+			$extensionConfiguration = array();
+		}
+		return $extensionConfiguration;
 
 	}
 

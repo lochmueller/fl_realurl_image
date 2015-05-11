@@ -1,9 +1,6 @@
 Option in the extension manager configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1) storagePid (Default: 0)
-Defining the page (PID) where fl_realurl_image stores it's DB-Table
-
 2) cacheControl (Default: 1)
 Enable the Cache Control Feature to get a better performance. If a file has already been loaded by a client it wont be sent again. The browser cache is used. Speeds things up a lot and reduces server load.
 
