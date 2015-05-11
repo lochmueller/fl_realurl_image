@@ -23,28 +23,28 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @var array
 	 */
-	private $IMAGE_conf = array();
+	protected $IMAGE_conf = array();
 
 	/**
 	 * config.fl_realurl_image from setup.txt / TypoScript merged with IMAGE-Object.fl_realurl_image
 	 *
 	 * @var array
 	 */
-	private $fl_conf = array();
+	protected $fl_conf = array();
 
 	/**
 	 * image Array of Typo3
 	 *
 	 * @var array
 	 */
-	private $image = array();
+	protected $image = array();
 
 	/**
 	 * info about the file type
 	 *
 	 * @var array
 	 */
-	private $fileTypeInformation = array();
+	protected $fileTypeInformation = array();
 
 	/*
 	  - 0: Height
@@ -55,11 +55,11 @@ class RealUrlImage extends ContentObjectRenderer {
 	  - origFile_mtime: 1249081200
 	  - fileCacheHash: ed0180473f
 	 */
-	private $new_fileName = '';
+	protected $new_fileName = '';
 
-	private $org_fileName = '';
+	protected $org_fileName = '';
 
-	private $enable = TRUE;
+	protected $enable = TRUE;
 
 	/**
 	 * @var Configuration
@@ -179,7 +179,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @param       $cObj
 	 */
-	private function init($conf, $image, $file, $cObj) {
+	protected function init($conf, $image, $file, $cObj) {
 		// IMAGE_conf
 		$this->IMAGE_conf = $conf;
 		$this->cObj = $cObj;
@@ -240,7 +240,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return        string       the new file name
 	 */
-	private function generateFileName() {
+	protected function generateFileName() {
 		// generate a text basis for a speaking file name
 		if ($this->fl_conf['data'] && $this->new_fileName == '') {
 			$this->new_fileName = $this->generateTextBase();
@@ -286,7 +286,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return        string       Text name base
 	 */
-	private function generateTextBase() {
+	protected function generateTextBase() {
 		// get info to image
 		$pageInfo = $this->getPAGEinfo();
 		$falInfo = $this->getFALInfo();
@@ -371,7 +371,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return        array        (meta) info from page
 	 */
-	private function getPAGEinfo() {
+	protected function getPAGEinfo() {
 		$rootLineDepth = sizeof($GLOBALS['TSFE']->tmpl->rootLine);
 		$pageInfo = $GLOBALS['TSFE']->tmpl->rootLine[$rootLineDepth - 1];
 		return $pageInfo;
@@ -391,7 +391,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return      string      Encoded text string
 	 * @see rootLineToPath()
 	 */
-	private function smartEncoding($textBase) {
+	protected function smartEncoding($textBase) {
 		// decode $textBase
 		$textBase = urldecode($textBase);
 
@@ -426,7 +426,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return        string        Text base: e.g. typo3temp/fl_realurl_image/myimage-name-a7r
 	 */
-	private function addHash($textBase) {
+	protected function addHash($textBase) {
 		$org_base = pathinfo($this->org_fileName, PATHINFO_BASENAME);
 		$org_end = pathinfo($this->org_fileName, PATHINFO_EXTENSION);
 
@@ -466,9 +466,10 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return string|NULL the path of the new image after collision handling
 	 */
-	private function writeDBcollisionHandling($textBase) {
+	protected function writeDBcollisionHandling($textBase) {
 		list($trunk, $ending) = explode('.', $textBase);
 		$count = '';
+		$cache = $this->getCache();
 		while (1) {
 			if ($this->fl_conf['hashLength'] && $count && $count > 0) {
 				$space = '-';
@@ -479,7 +480,9 @@ class RealUrlImage extends ContentObjectRenderer {
 				$space = '';
 			}
 			$newImageName_probe = $trunk . $space . $count . '.' . $ending;
-			if ($this->writeDB($newImageName_probe)) {
+
+			if (!$cache->has($newImageName_probe)) {
+				$this->writeDB($newImageName_probe);
 				return $newImageName_probe;
 			} else {
 				// go count one up to avoid collision
@@ -500,30 +503,23 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return        boolean        successfull?
 	 */
-	private function writeDB($new_fileName) {
+	protected function writeDB($new_fileName) {
 
 		$cache = $this->getCache();
 		if ($cache->has($new_fileName)) {
 			$data = unserialize($cache->get($new_fileName));
-			$pids = explode(',', $data['page_id']);
-			if (!in_array($GLOBALS['TSFE']->id, $pids)) {
-				$page_id = trim($data['page_id'] . ',' . $GLOBALS['TSFE']->id, ',');
-			} else {
-				$page_id = trim($data['page_id'], ',');
+			$pids = GeneralUtility::intExplode(',', $data['page_id'], TRUE);
+			if (!in_array((int)$GLOBALS['TSFE']->id, $pids)) {
+				$pids[] = (int)$GLOBALS['TSFE']->id;
 			}
-			// insert in DB
 			$data['tstamp'] = time();
-			$data['page_id'] = $page_id;
+			$data['page_id'] = implode(',', $pids);
 		} else {
 			$data = array(
 				'crdate'     => time(),
-				// image link first created at
 				'tstamp'     => time(),
-				// image link last requestet on
 				'image_path' => $this->org_fileName,
-				// path to the original image
 				'page_id'    => $GLOBALS['TSFE']->id
-				// comma seperated list of pid's where the image has been requested from
 			);
 		}
 		$cache->set($new_fileName, serialize($data));
@@ -540,7 +536,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return      NULL
 	 */
-	private function deleteFileCache($org_path, $new_path) {
+	protected function deleteFileCache($org_path, $new_path) {
 		if (TYPO3_OS == 'WIN') {
 			if (is_file($new_path) && (md5_file($org_path) != md5_file($new_path))) {
 				unlink($new_path);
@@ -561,7 +557,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @throws \Exception
 	 */
-	private function createFileCache($relativeOriginalPath, $relativeNewPath) {
+	protected function createFileCache($relativeOriginalPath, $relativeNewPath) {
 		if ($this->configuration->get('fileLinks') == 'none') {
 			return;
 		}
@@ -608,7 +604,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 *
 	 * @return        string      the path after removing
 	 */
-	private function virtualPathRemove($path) {
+	protected function virtualPathRemove($path) {
 		if ($this->configuration->get('virtualPathRemove')) {
 			return str_replace($this->configuration->get('virtualPathRemove'), '', $path);
 		}
