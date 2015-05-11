@@ -556,57 +556,47 @@ class RealUrlImage extends ContentObjectRenderer {
 	/**
 	 * creates a hard-link / sym-link / copy of the oritinal image to the new location
 	 *
-	 * @param string $org_path the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
-	 * @param string $new_path the path to the new image
+	 * @param string $relativeOriginalPath the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
+	 * @param string $relativeNewPath      the path to the new image
 	 *
 	 * @throws \Exception
 	 */
-	private function createFileCache($org_path, $new_path) {
+	private function createFileCache($relativeOriginalPath, $relativeNewPath) {
+		if ($this->configuration->get('fileLinks') == 'none') {
+			return;
+		}
+
+		$absoluteNewPath = GeneralUtility::getFileAbsFileName($relativeNewPath);
+		if (is_file($absoluteNewPath) || is_link($absoluteNewPath)) {
+			return;
+		}
 
 		// Better to throw a exception to find the mistake?!?!
-		if (empty($org_path)) {
+		if (empty($relativeOriginalPath)) {
 			return;
 		}
 
 		// create folder if required
-		$new_folder = GeneralUtility::dirname($new_path);
+		$new_folder = GeneralUtility::dirname($relativeNewPath);
 		if ($new_folder && !is_dir($new_folder)) {
 			if (!GeneralUtility::mkdir($new_folder)) {
 				throw new \Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
 			}
 		}
 		if (TYPO3_OS == 'WIN') {
-			if (is_file($new_path)) {
-				return;
-			}
-			// no copy
-			if ($this->configuration->get('fileLinks') == 'none') {
-				return;
-			} // true copy
-			elseif ($this->configuration->get('fileLinks') == 'copy') {
-				copy($org_path, $new_path);
-			} // symlink
-			// ... not possible in WIN => = hard-link
-			// hard-link
-			else {
-				exec('fsutil hardlink create "' . $new_path . '" "' . $org_path . '"');
+			if ($this->configuration->get('fileLinks') == 'copy') {
+				copy($relativeOriginalPath, $absoluteNewPath);
+			} else {
+				// symlink is not possible
+				exec('fsutil hardlink create "' . $relativeNewPath . '" "' . $relativeOriginalPath . '"');
 			}
 		} else {
-			if (is_file(PATH_site . $new_path)) {
-				return;
-			}
-			// no copy
-			if ($this->configuration->get('fileLinks') == 'none') {
-				return;
-			} // true copy
-			elseif ($this->configuration->get('fileLinks') == 'copy') {
-				copy(PATH_site . $org_path, PATH_site . $new_path);
-			} // symlink
-			elseif ($this->configuration->get('fileLinks') == 'symLink') {
-				symlink(PATH_site . $org_path, PATH_site . $new_path); // Secure for open_basedir restriction
-			} // hard-link
-			else {
-				link($org_path, PATH_site . $new_path);
+			if ($this->configuration->get('fileLinks') == 'copy') {
+				copy(PATH_site . $relativeOriginalPath, $absoluteNewPath);
+			} elseif ($this->configuration->get('fileLinks') == 'symLink') {
+				symlink(PATH_site . $relativeOriginalPath, $absoluteNewPath);
+			} else {
+				link($relativeOriginalPath, $absoluteNewPath);
 			}
 		}
 	}

@@ -34,6 +34,7 @@ class ImageResource extends ImageResourceContentObject {
 		if (is_array($GLOBALS['TSFE']->lastImgResourceInfo)) {
 			// call fl_realurl_image to generate $new_fileName
 			$tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+			$tx_flrealurlimage->start(NULL, NULL);
 			$new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
 
 			// generate the image URL
