@@ -9,6 +9,7 @@
 namespace FRUIT\FlRealurlImage;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
@@ -227,7 +228,7 @@ class RealUrlImage extends ContentObjectRenderer {
 		}
 
 		// org_fileName
-		$this->org_fileName = htmlspecialchars(trim(GeneralUtility::rawUrlEncodeFP($image[3])));
+		$this->org_fileName = $image[3];
 	}
 
 	/**
@@ -427,8 +428,8 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return        string        Text base: e.g. typo3temp/fl_realurl_image/myimage-name-a7r
 	 */
 	protected function addHash($textBase) {
-		$org_base = pathinfo($this->org_fileName, PATHINFO_BASENAME);
-		$org_end = pathinfo($this->org_fileName, PATHINFO_EXTENSION);
+		$org_base = PathUtility::pathinfo($this->org_fileName, PATHINFO_BASENAME);
+		$org_end = PathUtility::pathinfo($this->org_fileName, PATHINFO_EXTENSION);
 
 		$hashBase = $org_base;
 		if (isset($this->image[3]) && strlen($this->image[3])) {
@@ -558,6 +559,17 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @throws \Exception
 	 */
 	protected function createFileCache($relativeOriginalPath, $relativeNewPath) {
+		$absoluteOriginalPath = GeneralUtility::getFileAbsFileName($relativeOriginalPath);
+
+		if (!is_file($absoluteOriginalPath)) { 
+			$relativeOriginalPath = rawurldecode($relativeOriginalPath);
+			$absoluteOriginalPath = GeneralUtility::getFileAbsFileName($relativeOriginalPath);
+			// error no valid $relativeOriginalPath
+			if (!is_file($absoluteOriginalPath)) {
+				return;
+			}
+		}
+
 		if ($this->configuration->get('fileLinks') == 'none') {
 			return;
 		}
@@ -588,9 +600,9 @@ class RealUrlImage extends ContentObjectRenderer {
 			}
 		} else {
 			if ($this->configuration->get('fileLinks') == 'copy') {
-				copy(PATH_site . $relativeOriginalPath, $absoluteNewPath);
+				copy($absoluteOriginalPath, $absoluteNewPath);
 			} elseif ($this->configuration->get('fileLinks') == 'symLink') {
-				symlink(PATH_site . $relativeOriginalPath, $absoluteNewPath);
+				symlink($absoluteOriginalPath, $absoluteNewPath);
 			} else {
 				link($relativeOriginalPath, $absoluteNewPath);
 			}
