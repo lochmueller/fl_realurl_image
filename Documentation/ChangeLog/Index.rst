@@ -1,10 +1,15 @@
 ChangeLog
 ---------
 
+3.3.0 May 18, 2015
+
 - Remove removeDoubleEntriesCommand, because the CF do not allow double entries
 - Introduce the Caching Framework
 - Prepare configuration handling
 - Code cleanups
+- Fix Caching bug
+- Fix generation of the text base
+- cleanups
 
 3.2.0 May 03, 2015
 

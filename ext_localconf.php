@@ -13,7 +13,6 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObje
 	'className' => 'FRUIT\\FlRealurlImage\\Xclass\\ImageResource',
 );
 
-// new Cache for Images paths
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['fl_realurl_image'] = array(
 	'frontend' => 'FRUIT\\FlRealurlImage\\Cache\\UriFrontend',
 );
