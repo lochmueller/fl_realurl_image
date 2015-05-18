@@ -512,7 +512,8 @@ class RealUrlImage extends ContentObjectRenderer {
 	protected function writeDB($new_fileName) {
 
 		$cache = $this->getCache();
-		if ($cache->has($new_fileName)) {
+		$cacheIdent = $this->org_fileName;
+		if ($cache->has($cacheIdent)) {
 			$data = unserialize($cache->get($new_fileName));
 			$pids = GeneralUtility::intExplode(',', $data['page_id'], TRUE);
 			if (!in_array((int)$GLOBALS['TSFE']->id, $pids)) {
@@ -525,10 +526,11 @@ class RealUrlImage extends ContentObjectRenderer {
 				'crdate'     => time(),
 				'tstamp'     => time(),
 				'image_path' => $this->org_fileName,
+				'new_path'   => $new_fileName,
 				'page_id'    => $GLOBALS['TSFE']->id
 			);
 		}
-		$cache->set($new_fileName, serialize($data));
+		$cache->set($cacheIdent, serialize($data));
 		return TRUE;
 	}
 
