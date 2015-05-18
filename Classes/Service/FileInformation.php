@@ -10,8 +10,8 @@ namespace FRUIT\FlRealurlImage\Service;
 use FRUIT\FlRealurlImage\Xclass\ContentObjectRenderer;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\MathUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * File information service
@@ -64,7 +64,7 @@ class FileInformation {
 
 				if (MathUtility::canBeInterpretedAsInteger($file)) {
 					if (!empty($fileArray['treatIdAsReference'])) {
-						$fileReference = $cObj->getRFactory()
+						$fileReference = ResourceFactory::getInstance()
 							->getFileReferenceObject($file);
 					}
 				}

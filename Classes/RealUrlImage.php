@@ -27,6 +27,11 @@ class RealUrlImage extends ContentObjectRenderer {
 	protected $IMAGE_conf = array();
 
 	/**
+	 * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+	 */
+	protected $currentCobj = NULL;
+
+	/**
 	 * config.fl_realurl_image from setup.txt / TypoScript merged with IMAGE-Object.fl_realurl_image
 	 *
 	 * @var array
@@ -183,7 +188,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	protected function init($conf, $image, $file, $cObj) {
 		// IMAGE_conf
 		$this->IMAGE_conf = $conf;
-		$this->cObj = $cObj;
+		$this->currentCobj = $cObj;
 
 		// fl_conf
 		$global_conf = array();
@@ -350,7 +355,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	protected function getFALReferenceInfo() {
 		if ($fileInformation = $this->getFileInformation()) {
-			return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf, $GLOBALS['TSFE']->cObj);
+			return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf, $this->currentCobj);
 		}
 		return array();
 	}
@@ -561,7 +566,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	protected function createFileCache($relativeOriginalPath, $relativeNewPath) {
 		$absoluteOriginalPath = GeneralUtility::getFileAbsFileName($relativeOriginalPath);
 
-		if (!is_file($absoluteOriginalPath)) { 
+		if (!is_file($absoluteOriginalPath)) {
 			$relativeOriginalPath = rawurldecode($relativeOriginalPath);
 			$absoluteOriginalPath = GeneralUtility::getFileAbsFileName($relativeOriginalPath);
 			// error no valid $relativeOriginalPath
