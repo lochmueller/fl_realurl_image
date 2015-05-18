@@ -9,6 +9,7 @@
 namespace FRUIT\FlRealurlImage\Xclass;
 
 use FRUIT\FlRealurlImage\RealUrlImage;
+use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -56,7 +57,15 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
 
 		if (is_array($info)) {
 			if (is_file(PATH_site . $info['3'])) {
-				$source = GeneralUtility::rawUrlEncodeFP(GeneralUtility::png_to_gif_by_imagemagick($info[3]));
+				$graphicalFunctionsClass = 'TYPO3\\CMS\\Core\\Imaging\\GraphicalFunctions';
+				if (class_exists($graphicalFunctionsClass) && method_exists($graphicalFunctionsClass, 'pngToGifByImagemagick')) {
+					// modern
+					$return = GraphicalFunctions::pngToGifByImagemagick($info[3]);
+				} else {
+					// deprecated
+					$return = GeneralUtility::png_to_gif_by_imagemagick($info[3]);
+				}
+				$source = GeneralUtility::rawUrlEncodeFP($return);
 				$source = $GLOBALS['TSFE']->absRefPrefix . $source;
 			} else {
 				$source = $info[3];
