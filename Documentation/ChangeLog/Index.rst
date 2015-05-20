@@ -1,6 +1,8 @@
 ChangeLog
 ---------
 
+3.3.1 May 20, 2015
+
 - Fix Bug https://forge.typo3.org/issues/67054
 
 3.3.0 May 18, 2015
