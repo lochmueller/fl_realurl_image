@@ -317,7 +317,7 @@ class RealUrlImage extends ContentObjectRenderer {
 					break;
 				case 'ts':
 					if ($this->IMAGE_conf[$item] || $this->IMAGE_conf[$item . '.']) {
-						$tsResult = $this->stdWrap($this->IMAGE_conf[$item], $this->IMAGE_conf[$item . '.']);
+						$tsResult = $this->currentCobj->stdWrap($this->IMAGE_conf[$item], $this->IMAGE_conf[$item . '.']);
 						if (strlen(trim($tsResult))) {
 							return trim($tsResult);
 						}
