@@ -1,6 +1,8 @@
 ChangeLog
 ---------
 
+- Fix Bug https://forge.typo3.org/issues/67054
+
 3.3.0 May 18, 2015
 
 - Remove removeDoubleEntriesCommand, because the CF do not allow double entries
