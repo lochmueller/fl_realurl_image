@@ -7,7 +7,7 @@ conf.py:
   copyright: 2015
   project: 'Image RealURL'
   version: 3.3
-  release: 3.3.1
+  release: 3.4.0
   highlight_language: php
   latex_documents:
   - - Index
