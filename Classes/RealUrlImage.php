@@ -72,6 +72,22 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	protected $configuration = NULL;
 
+	static protected $viewHelperInformation = NULL;
+
+	/**
+	 * @param $information
+	 */
+	public static function setViewHelperInformation(array $information) {
+		self::$viewHelperInformation = $information;
+	}
+
+	/**
+	 *
+	 */
+	public static function resetViewHelperInformation() {
+		self::$viewHelperInformation = NULL;
+	}
+
 	/**
 	 * Build up the object
 	 */
@@ -173,7 +189,6 @@ class RealUrlImage extends ContentObjectRenderer {
 			}
 		}
 		return $this->org_fileName;
-
 	}
 
 	/**
@@ -313,6 +328,11 @@ class RealUrlImage extends ContentObjectRenderer {
 				case 'fal':
 					if ($falInfo[$item] && strlen(trim($falInfo[$item]))) {
 						return trim($falInfo[$item]);
+					}
+					break;
+				case 'vh':
+					if (self::$viewHelperInformation !== NULL && isset(self::$viewHelperInformation[$item]) && trim(self::$viewHelperInformation[$item]) !== '') {
+						return trim(self::$viewHelperInformation[$item]);
 					}
 					break;
 				case 'ts':

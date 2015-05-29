@@ -12,6 +12,9 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObje
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObject\\ImageResourceContentObject'] = array(
 	'className' => 'FRUIT\\FlRealurlImage\\Xclass\\ImageResource',
 );
+$GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Fluid\\ViewHelpers\\ImageViewHelper'] = array(
+	'className' => 'FRUIT\\FlRealurlImage\\Xclass\\ImageViewHelper',
+);
 
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['fl_realurl_image'] = array(
 	'frontend' => 'FRUIT\\FlRealurlImage\\Cache\\UriFrontend',
