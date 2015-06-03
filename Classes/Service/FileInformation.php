@@ -24,12 +24,16 @@ class FileInformation {
 	 * Get information from the fal record of the current rendering
 	 *
 	 * @param array $imageInformation
+	 * @param mixed $imageInformation
 	 *
 	 * @return array
 	 */
-	public function getByFal($imageInformation) {
+	public function getByFal($imageInformation, $fileTypeInformation) {
 		if ($imageInformation['originalFile'] instanceof File) {
 			return $imageInformation['originalFile']->getProperties();
+		} elseif ($fileTypeInformation instanceof FileReference) {
+			return $fileTypeInformation->getOriginalFile()
+				->getProperties();
 		}
 		return array();
 	}
@@ -46,9 +50,13 @@ class FileInformation {
 	 * @return array
 	 */
 	public function getByFalReference($imageInformation, $file, $conf, $cObj) {
+		if ($file instanceof FileReference) {
+			return $file->getProperties();
+		}
 		if (!($cObj instanceof ContentObjectRenderer)) {
 			return array();
 		}
+
 		$fileReference = NULL;
 		$fileArray = $conf['file.'];
 		if ($file instanceof FileReference) {
