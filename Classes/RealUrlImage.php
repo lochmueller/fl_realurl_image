@@ -9,6 +9,7 @@
 namespace FRUIT\FlRealurlImage;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Utility\ArrayUtility;
@@ -385,7 +386,7 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	protected function getFALInfo() {
 		if ($fileInformation = $this->getFileInformation()) {
-			return $fileInformation->getByFal($this->image);
+			return $fileInformation->getByFal($this->image, $this->fileTypeInformation);
 		}
 		return array();
 	}
@@ -453,23 +454,16 @@ class RealUrlImage extends ContentObjectRenderer {
 	 * @return        string        Text base: e.g. typo3temp/fl_realurl_image/myimage-name-a7r
 	 */
 	protected function addHash($textBase) {
-		$org_base = PathUtility::pathinfo($this->org_fileName, PATHINFO_BASENAME);
-		$org_end = PathUtility::pathinfo($this->org_fileName, PATHINFO_EXTENSION);
-
-		$hashBase = $org_base;
 		if (isset($this->image[3]) && strlen($this->image[3])) {
 			$hashBase = GeneralUtility::shortMD5($this->image[3], 24);
+		} else {
+			$hashBase = PathUtility::pathinfo($this->org_fileName, PATHINFO_BASENAME);
 		}
-		$hashLength = isset($this->fl_conf['hashLength']) ? (int)$this->fl_conf['hashLength'] : 0;
-
+		$hashLength = isset($this->fl_conf['hashLength']) ? MathUtility::forceIntegerInRange((int)$this->fl_conf['hashLength'], 0, strlen($hashBase)) : 0;
 		if ($hashLength) {
-			$space = $this->getSpaceCharacter();
-			if ($hashLength > strlen($hashBase)) {
-				$hashLength = strlen($hashBase);
-			}
-			$textBase .= $space . substr($org_base, 0, $hashLength);
+			$textBase .= $this->getSpaceCharacter() . substr($hashBase, 0, $hashLength);
 		}
-		return $textBase . '.' . $org_end;
+		return $textBase . '.' . PathUtility::pathinfo($this->org_fileName, PATHINFO_EXTENSION);
 	}
 
 	/**
