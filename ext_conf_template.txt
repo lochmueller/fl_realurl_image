@@ -5,4 +5,4 @@ cacheControl = 1
 fileLinks = symLink
 
 # cat=basic; type=string; label=LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:fl_realurl_image.ext_conf_virtualPathRemove
-virtualPathRemove = 
+virtualPathRemove =

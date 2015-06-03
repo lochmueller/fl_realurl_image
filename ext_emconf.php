@@ -15,4 +15,3 @@ $EM_CONF['fl_realurl_image'] = array(
 		),
 	),
 );
-

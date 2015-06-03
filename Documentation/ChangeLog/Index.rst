@@ -1,6 +1,14 @@
 ChangeLog
 ---------
 
+x.x.x
+
+- Cleanup ext_* files
+
+3.4.0  May 30, 2015
+
+- Overwrite ViewHelper to get image names from the given alt attribute of f:image
+
 3.3.1 May 20, 2015
 
 - Fix Bug https://forge.typo3.org/issues/67054
