@@ -1,9 +1,10 @@
 ChangeLog
 ---------
 
-x.x.x
+3.4.1 June 7, 2015
 
 - Cleanup ext_* files
+- Fix the handling of the f:image ViewHelper
 
 3.4.0  May 30, 2015
 
