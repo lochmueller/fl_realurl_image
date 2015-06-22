@@ -249,7 +249,7 @@ class RealUrlImage extends ContentObjectRenderer {
 		}
 
 		// org_fileName
-		$this->org_fileName = $image[3];
+		$this->org_fileName = urldecode($image[3]);
 	}
 
 	/**
