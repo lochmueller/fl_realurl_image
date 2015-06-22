@@ -1,6 +1,10 @@
 ChangeLog
 ---------
 
+3.5.0 June 22, 2015
+
+- Release for TYPO3 up to 7.99.99
+
 3.4.1 June 7, 2015
 
 - Cleanup ext_* files
