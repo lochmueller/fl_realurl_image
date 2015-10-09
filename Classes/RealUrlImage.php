@@ -338,7 +338,7 @@ class RealUrlImage extends ContentObjectRenderer {
 					break;
 				case 'ts':
 					if ($this->IMAGE_conf[$item] || $this->IMAGE_conf[$item . '.']) {
-						$tsResult = $this->currentCobj->stdWrap($this->IMAGE_conf[$item], $this->IMAGE_conf[$item . '.']);
+						$tsResult = $this->getCObj()->stdWrap($this->IMAGE_conf[$item], $this->IMAGE_conf[$item . '.']);
 						if (strlen(trim($tsResult))) {
 							return trim($tsResult);
 						}
@@ -376,9 +376,21 @@ class RealUrlImage extends ContentObjectRenderer {
 	 */
 	protected function getFALReferenceInfo() {
 		if ($fileInformation = $this->getFileInformation()) {
-			return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf, $this->currentCobj);
+			return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf, $this->getCObj());
 		}
 		return array();
+	}
+
+	/**
+	 * Get a valid cObj
+	 *
+	 * @return \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+	 */
+	protected function getCObj(){
+		if(is_object($this->currentCobj)) {
+			return $this->currentCobj;
+		}
+		return GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
 	}
 
 	/**
