@@ -1,0 +1,35 @@
+{
+  "name": "lochmueller/fl-realurl-image",
+  "type": "typo3-cms-extension",
+  "description": "Add the RealURL functionality to image files. 'typo3temp/2d972d5c89b5.jpg' goes 'nice-name.jpg'! Many different fallbacks like file reference, file, content element or page settings to get the right file name.",
+  "autoload": {
+    "psr-4": {
+      "FRUIT\\FlRealurlImage\\": "Classes/"
+    }
+  },
+  "keywords": [
+    "TYPO3 CMS",
+    "Realurl"
+  ],
+  "authors": [
+    {
+      "name": "Tim Lochmüller",
+      "email": "webmaster@fruit-lab.de",
+      "role": "Developer",
+      "homepage": "https://github.com/lochmueller"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "typo3/cms-core": "~6.2.14|>=7.4.0,<8.0"
+  },
+  "replace": {
+    "fl_realurl_image": "self.version",
+    "typo3-ter/fl_realurl_image": "self.version"
+  },
+  "homepage": "https://github.com/lochmueller/fl_realurl_image",
+  "license": "GPL-2.0+",
+  "support": {
+    "issues": "https://github.com/lochmueller/fl_realurl_image/issues"
+  }
+}
