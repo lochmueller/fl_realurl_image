@@ -322,6 +322,7 @@ class RealUrlImage extends ContentObjectRenderer
         // get info to image
         $pageInfo = $this->getPAGEinfo();
         $falInfo = $this->getFALInfo();
+        $falInfoMeta = $this->getFALMetaInfo();
         $falReferenceInfo = $this->getFALReferenceInfo();
 
         // walk the options until a possible base for a file-name is found
@@ -339,6 +340,11 @@ class RealUrlImage extends ContentObjectRenderer
                 case 'fal':
                     if ($falInfo[$item] && strlen(trim($falInfo[$item]))) {
                         return trim($falInfo[$item]);
+                    }
+                    break;
+                case 'falmeta':
+                    if ($falInfoMeta[$item] && strlen(trim($falInfoMeta[$item]))) {
+                        return trim($falInfoMeta[$item]);
                     }
                     break;
                 case 'vh':
@@ -418,6 +424,18 @@ class RealUrlImage extends ContentObjectRenderer
         }
         return array();
     }
+    /**
+     * @return array
+     */
+    protected function getFALMetaInfo()
+    {
+        if ($fileInformation = $this->getFileInformation()) {
+            return $fileInformation->getByFalMetaData($this->image, $this->fileTypeInformation);
+        }
+        return array();
+    }
+
+
 
     /**
      * get (meta) info for the current Page

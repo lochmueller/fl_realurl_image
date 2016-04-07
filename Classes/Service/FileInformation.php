@@ -43,6 +43,22 @@ class FileInformation
     /**
      * Get information from the fal record of the current rendering
      *
+     * @param array $imageInformation
+     * @param mixed $imageInformation
+     *
+     * @return array
+     */
+    public function getByFalMetaData($imageInformation, $fileTypeInformation)
+    {
+        if ($imageInformation['originalFile'] instanceof File) {
+            return $imageInformation['originalFile']->_getMetaData();
+        }
+        return array();
+    }
+
+    /**
+     * Get information from the fal record of the current rendering
+     *
      * @param array                                                    $imageInformation
      *
      * @param                                                          $file
@@ -91,4 +107,4 @@ class FileInformation
         return array();
     }
 
-} 
+}
