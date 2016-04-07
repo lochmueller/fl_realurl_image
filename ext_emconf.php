@@ -11,7 +11,7 @@ $EM_CONF['fl_realurl_image'] = array(
     'author_company' => 'typo3.fruit-lab.de',
     'constraints'    => array(
         'depends' => array(
-            'typo3' => '6.2.0-7.99.99',
+            'typo3' => '6.2.0-8.99.99',
         ),
     ),
 );
