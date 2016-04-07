@@ -8,7 +8,6 @@
 namespace FRUIT\FlRealurlImage\Provider;
 
 use TYPO3\CMS\Core\Resource\File;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * FalMetaProvider

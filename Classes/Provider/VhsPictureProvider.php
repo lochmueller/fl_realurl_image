@@ -8,7 +8,6 @@
 namespace FRUIT\FlRealurlImage\Provider;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * VhsPictureProvider
@@ -54,7 +53,7 @@ class VhsPictureProvider extends AbstractProvider
         if ($source === 'fal') {
             $provider = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Provider\\FalProvider', ['file' => $file]);
         } elseif ($source === 'falmeta') {
-            return '';
+            $provider = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Provider\\FalMetaProvider', ['file' => $file]);
         } else {
             return '';
         }
