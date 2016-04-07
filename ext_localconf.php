@@ -13,6 +13,12 @@ $xClass = array(
     'TYPO3\\CMS\\Fluid\\ViewHelpers\\ImageViewHelper'                 => 'ImageViewHelper',
     'TYPO3\\CMS\\Fluid\\ViewHelpers\\Uri\\ImageViewHelper'            => 'UriImageViewHelper',
 );
+
+if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('vhs')) {
+    $xClass['FluidTYPO3\\Vhs\\ViewHelpers\\Media\\PictureViewHelper'] = 'Vhs\\ViewHelpers\\Media\\PictureViewHelper';
+    $xClass['FluidTYPO3\\Vhs\\ViewHelpers\\Media\\SourceViewHelper'] = 'Vhs\\ViewHelpers\\Media\\SourceViewHelper';
+}
+
 foreach ($xClass as $source => $target) {
     $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects'][$source] = array('className' => 'FRUIT\\FlRealurlImage\\Xclass\\' . $target);
 }
