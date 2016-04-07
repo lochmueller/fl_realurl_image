@@ -1,7 +1,8 @@
 <?php
 
 if (!defined('TYPO3_MODE')) {
-	die('Access denied.');
+    die('Access denied.');
 }
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('fl_realurl_image', 'Configuration/TypoScript/', 'RealURL Image');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('fl_realurl_image', 'Configuration/TypoScript/',
+    'RealURL Image');

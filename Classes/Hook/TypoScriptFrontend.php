@@ -14,18 +14,20 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  *
  * @author Tim Lochmüller
  */
-class TypoScriptFrontend {
+class TypoScriptFrontend
+{
 
-	/**
-	 * Hook method for realurl image decode
-	 *
-	 * @param $params
-	 * @param $ref
-	 *
-	 * @return    void
-	 */
-	function checkImageDecode(&$params, &$ref) {
-		$realurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
-		$realurlimage->showImage();
-	}
+    /**
+     * Hook method for realurl image decode
+     *
+     * @param $params
+     * @param $ref
+     *
+     * @return    void
+     */
+    function checkImageDecode(&$params, &$ref)
+    {
+        $realurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        $realurlimage->showImage();
+    }
 }
