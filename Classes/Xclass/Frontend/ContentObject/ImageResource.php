@@ -6,17 +6,16 @@
  * @author Tim Lochmüller
  */
 
-namespace FRUIT\FlRealurlImage\Xclass;
+namespace FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject;
 
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject;
 
 /**
  * Class ImageResource
  *
  * @package FRUIT\FlRealurlImage\Xclass
  */
-class ImageResource extends ImageResourceContentObject
+class ImageResource extends \TYPO3\CMS\Frontend\ContentObject\ImageResourceContentObject
 {
 
     /**

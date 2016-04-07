@@ -6,7 +6,7 @@
  * @author Tim Lochmüller
  */
 
-namespace FRUIT\FlRealurlImage\Xclass;
+namespace FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject;
 
 use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Imaging\GraphicalFunctions;

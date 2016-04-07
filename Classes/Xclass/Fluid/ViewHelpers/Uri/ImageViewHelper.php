@@ -5,7 +5,7 @@
  * @author  Dennis Geldmacher
  */
 
-namespace FRUIT\FlRealurlImage\Xclass;
+namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers\Uri;
 
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Extbase\Domain\Model\AbstractFileFolder;
@@ -15,7 +15,7 @@ use TYPO3\CMS\Extbase\Domain\Model\AbstractFileFolder;
  *
  * @author Dennis Geldmacher
  */
-class UriImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
+class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
 {
 
     /**

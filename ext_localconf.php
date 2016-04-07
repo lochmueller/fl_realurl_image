@@ -8,10 +8,10 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tslib/class.hook_tslib_fe.php']['conn
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['fl_realurl_image'] = array('frontend' => 'FRUIT\\FlRealurlImage\\Cache\\UriFrontend');
 
 $xClass = array(
-    'TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer'      => 'ContentObjectRenderer',
-    'TYPO3\\CMS\\Frontend\\ContentObject\\ImageResourceContentObject' => 'ImageResource',
-    'TYPO3\\CMS\\Fluid\\ViewHelpers\\ImageViewHelper'                 => 'ImageViewHelper',
-    'TYPO3\\CMS\\Fluid\\ViewHelpers\\Uri\\ImageViewHelper'            => 'UriImageViewHelper',
+    'TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer'      => 'Frontend\\ContentObject\\ContentObjectRenderer',
+    'TYPO3\\CMS\\Frontend\\ContentObject\\ImageResourceContentObject' => 'Frontend\\ContentObject\\ImageResource',
+    'TYPO3\\CMS\\Fluid\\ViewHelpers\\ImageViewHelper'                 => 'Fluid\\ViewHelpers\\ImageViewHelper',
+    'TYPO3\\CMS\\Fluid\\ViewHelpers\\Uri\\ImageViewHelper'            => 'Fluid\\ViewHelpers\\Uri\\ImageViewHelper',
 );
 
 if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('vhs')) {
