@@ -8,7 +8,6 @@
 namespace FRUIT\FlRealurlImage\Provider;
 
 use TYPO3\CMS\Backend\Utility\BackendUtility;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
 
 /**
  * PageProvider

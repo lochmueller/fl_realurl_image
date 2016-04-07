@@ -10,6 +10,7 @@ $GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations']['fl_realurl
 $xClass = array(
     'TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer'      => 'Frontend\\ContentObject\\ContentObjectRenderer',
     'TYPO3\\CMS\\Frontend\\ContentObject\\ImageResourceContentObject' => 'Frontend\\ContentObject\\ImageResource',
+    'TYPO3\\CMS\\Fluid\\ViewHelpers\\MediaViewHelper'                 => 'Fluid\\ViewHelpers\\MediaViewHelper',
     'TYPO3\\CMS\\Fluid\\ViewHelpers\\ImageViewHelper'                 => 'Fluid\\ViewHelpers\\ImageViewHelper',
     'TYPO3\\CMS\\Fluid\\ViewHelpers\\Uri\\ImageViewHelper'            => 'Fluid\\ViewHelpers\\Uri\\ImageViewHelper',
 );

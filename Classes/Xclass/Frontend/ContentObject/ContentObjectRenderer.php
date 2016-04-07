@@ -10,6 +10,9 @@ namespace FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject;
 
 use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
+use TYPO3\CMS\Core\Resource\Exception;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -55,6 +58,10 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
      */
     function cImage($file, $conf)
     {
+        if (GeneralUtility::compat_version('7.0')) {
+            return $this->cImage7AndUp($file, $conf);
+        }
+
         $info = $this->getImgResource($file, $conf['file.']);
         $GLOBALS['TSFE']->lastImageInfo = $info;
 
@@ -129,6 +136,130 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         }
 
         return parent::cImage($file, $conf);
+    }
+
+    /**
+     * Returns a <img> tag with the image file defined by $file and processed according to the properties in the TypoScript array.
+     * Mostly this function is a sub-function to the IMAGE function which renders the IMAGE cObject in TypoScript.
+     * This function is called by "$this->cImage($conf['file'], $conf);" from IMAGE().
+     *
+     * @param string $file File TypoScript resource
+     * @param array  $conf TypoScript configuration properties
+     *
+     * @return string <img> tag, (possibly wrapped in links and other HTML) if any image found.
+     * @access private
+     * @see    IMAGE()
+     */
+    public function cImage7AndUp($file, $conf)
+    {
+        $tsfe = $this->getTypoScriptFrontendController();
+        $info = $this->getImgResource($file, $conf['file.']);
+        $tsfe->lastImageInfo = $info;
+        if (!is_array($info)) {
+            return '';
+        }
+        if (is_file(PATH_site . $info['3'])) {
+            $source = $tsfe->absRefPrefix . GeneralUtility::rawUrlEncodeFP($info['3']);
+        } else {
+            $source = $info[3];
+        }
+
+        $layoutKey = $this->stdWrap($conf['layoutKey'], $conf['layoutKey.']);
+        $imageTagTemplate = $this->getImageTagTemplate($layoutKey, $conf);
+        $sourceCollection = $this->getImageSourceCollection($layoutKey, $conf, $file);
+
+        // This array is used to collect the image-refs on the page...
+        $tsfe->imagesOnPage[] = $source;
+        $altParam = $this->getAltParam($conf);
+        $params = $this->stdWrapValue('params', $conf);
+        if ($params !== '' && $params[0] !== ' ') {
+            $params = ' ' . $params;
+        }
+
+        $imageTagValues = array(
+            'width'               => (int)$info[0],
+            'height'              => (int)$info[1],
+            'src'                 => htmlspecialchars($source),
+            'params'              => $params,
+            'altParams'           => $altParam,
+            'border'              => $this->getBorderAttr(' border="' . (int)$conf['border'] . '"'),
+            'sourceCollection'    => $sourceCollection,
+            'selfClosingTagSlash' => (!empty($tsfe->xhtmlDoctype) ? ' /' : ''),
+        );
+
+        // ###################################
+        // ## Here begins RealUrl_image ######
+        // ###################################
+        $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        $tx_flrealurlimage->start($this->data, $this->table);
+        $new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
+        $imageTagValues['src'] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;
+        // ##################################
+        // ### Here ends RealURL_Image ######
+        // ##################################
+
+        $theValue = $this->substituteMarkerArray($imageTagTemplate, $imageTagValues, '###|###', true, true);
+
+        $linkWrap = isset($conf['linkWrap.']) ? $this->stdWrap($conf['linkWrap'], $conf['linkWrap.']) : $conf['linkWrap'];
+        if ($linkWrap) {
+            $theValue = $this->linkWrap($theValue, $linkWrap);
+        } elseif ($conf['imageLinkWrap']) {
+            $originalFile = !empty($info['originalFile']) ? $info['originalFile'] : $info['origFile'];
+            $theValue = $this->imageLinkWrap($theValue, $originalFile, $conf['imageLinkWrap.']);
+        }
+        $wrap = isset($conf['wrap.']) ? $this->stdWrap($conf['wrap'], $conf['wrap.']) : $conf['wrap'];
+        if ((string)$wrap !== '') {
+            $theValue = $this->wrap($theValue, $conf['wrap']);
+        }
+        return $theValue;
+    }
+
+    /**
+     * Creates and returns a TypoScript "imgResource".
+     * The value ($file) can either be a file reference (TypoScript resource) or the string "GIFBUILDER".
+     * In the first case a current image is returned, possibly scaled down or otherwise processed.
+     * In the latter case a GIFBUILDER image is returned; This means an image is made by TYPO3 from layers of elements as GIFBUILDER defines.
+     * In the function IMG_RESOURCE() this function is called like $this->getImgResource($conf['file'], $conf['file.']);
+     *
+     * Structure of the returned info array:
+     *  0 => width
+     *  1 => height
+     *  2 => file extension
+     *  3 => file name
+     *  origFile => original file name
+     *  origFile_mtime => original file mtime
+     *  -- only available if processed via FAL: --
+     *  originalFile => original file object
+     *  processedFile => processed file object
+     *  fileCacheHash => checksum of processed file
+     *
+     * @param string|File|FileReference $file      A "imgResource" TypoScript data type. Either a TypoScript file resource, a file or a file reference object or the string GIFBUILDER. See description above.
+     * @param array                     $fileArray TypoScript properties for the imgResource type
+     *
+     * @return array|NULL Returns info-array
+     * @see IMG_RESOURCE(), cImage(), \TYPO3\CMS\Frontend\Imaging\GifBuilder
+     */
+    public function getImgResource($file, $fileArray)
+    {
+        $result = parent::getImgResource($file, $fileArray);
+
+        if (!is_array($result)) {
+            return $result;
+        }
+
+        // ###################################
+        // ## Here begins RealUrl_image ######
+        // ###################################
+        $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        /** @var $tx_flrealurlimage \FRUIT\FlRealurlImage\RealUrlImage */
+        $tx_flrealurlimage->start($this->data, $this->table);
+        $new_fileName = $tx_flrealurlimage->main([], $result, $file, $this);
+        $result[3] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;
+        // ##################################
+        // ### Here ends RealURL_Image ######
+        // ##################################
+
+        return $result;
     }
 
 }

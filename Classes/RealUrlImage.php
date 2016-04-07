@@ -9,6 +9,7 @@
 namespace FRUIT\FlRealurlImage;
 
 use FRUIT\FlRealurlImage\Provider\AbstractProvider;
+use FRUIT\FlRealurlImage\Provider\FalMetaProvider;
 use FRUIT\FlRealurlImage\Provider\FalProvider;
 use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
@@ -268,7 +269,7 @@ class RealUrlImage extends ContentObjectRenderer
      * The main function of fl_realurl_image
      * - generates $this->new_fileName
      * - writes in DB
-     * - creats static file caches
+     * - create static file caches
      *
      * @param       nothing
      *
@@ -337,6 +338,7 @@ class RealUrlImage extends ContentObjectRenderer
             new VhsPictureProvider($baseInformation),
             new FalProvider($baseInformation),
             new PageProvider($baseInformation),
+            new FalMetaProvider($baseInformation),
         ];
 
         foreach ($configurations as $configuration) {
@@ -356,11 +358,6 @@ class RealUrlImage extends ContentObjectRenderer
                 case 'falref':
                     if ($falReferenceInfo[$item] && strlen(trim($falReferenceInfo[$item]))) {
                         return trim($falReferenceInfo[$item]);
-                    }
-                    break;
-                case 'falmeta':
-                    if ($falInfoMeta[$item] && strlen(trim($falInfoMeta[$item]))) {
-                        return trim($falInfoMeta[$item]);
                     }
                     break;
                 case 'vh':

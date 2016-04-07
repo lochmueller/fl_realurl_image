@@ -7,6 +7,9 @@
 
 namespace FRUIT\FlRealurlImage\Provider;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+
 /**
  * VhsPictureProvider
  */
@@ -39,9 +42,42 @@ class VhsPictureProvider extends AbstractProvider
      */
     public function getProviderInformation($key)
     {
-        //DebuggerUtility::var_dump($this->baseInformation);
-        //DebuggerUtility::var_dump(self::$viewHelperInformation, 'VHS Information');
-        return '';
+        if (self::$viewHelperInformation === []) {
+            return '';
+        }
+        if (!isset($this->baseInformation['image']['originalFile']) || !is_object($this->baseInformation['image']['originalFile'])) {
+            return '';
+        }
+        $file = $this->baseInformation['image']['originalFile'];
+
+        list($source, $field) = explode(':', $key);
+        if ($source === 'fal') {
+            $provider = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Provider\\FalProvider', ['file' => $file]);
+        } elseif ($source === 'falmeta') {
+            return '';
+        } else {
+            return '';
+        }
+
+        /** @var $provider AbstractProvider */
+        $value = $provider->getProviderInformation($field);
+        return strlen($value) ? $value . $this->getDimensions() : '';
+    }
+
+    /**
+     * Get dimensions
+     *
+     * @return string
+     */
+    protected function getDimensions()
+    {
+        if (!isset($this->baseInformation['image'][0])) {
+            return '';
+        }
+        if (!isset($this->baseInformation['image'][1])) {
+            return '';
+        }
+        return ' ' . $this->baseInformation['image'][0] . 'x' . $this->baseInformation['image'][1];
     }
 
     /**
