@@ -371,11 +371,6 @@ class RealUrlImage extends ContentObjectRenderer
                         return trim($pageInfo[$item]);
                     }
                     break;
-                default:
-                    if ($parts[$i] && strlen(trim($parts[$i]))) {
-                        return trim($parts[$i]);
-                    }
-                    break;
             }
         }
         return '';
@@ -424,6 +419,7 @@ class RealUrlImage extends ContentObjectRenderer
         }
         return array();
     }
+
     /**
      * @return array
      */
@@ -434,8 +430,6 @@ class RealUrlImage extends ContentObjectRenderer
         }
         return array();
     }
-
-
 
     /**
      * get (meta) info for the current Page
