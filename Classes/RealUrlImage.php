@@ -8,6 +8,9 @@
 
 namespace FRUIT\FlRealurlImage;
 
+use FRUIT\FlRealurlImage\Provider\AbstractProvider;
+use FRUIT\FlRealurlImage\Provider\FalProvider;
+use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -321,25 +324,38 @@ class RealUrlImage extends ContentObjectRenderer
     {
         // get info to image
         $pageInfo = $this->getPAGEinfo();
-        $falInfo = $this->getFALInfo();
         $falInfoMeta = $this->getFALMetaInfo();
         $falReferenceInfo = $this->getFALReferenceInfo();
 
-        // walk the options until a possible base for a file-name is found
-        $parts = GeneralUtility::trimExplode('//', $this->fl_conf['data'], true);
-        $partSize = sizeof($parts);
-        for ($i = 0; $i < $partSize; $i++) {
-            list($source, $item) = GeneralUtility::trimExplode(':', $parts[$i], true);
+        $configurations = $this->getConfigurationValues();
 
-            switch ($source) {
+        $baseInformation = [
+            'image'               => $this->image,
+            'fileTypeInformation' => $this->fileTypeInformation,
+        ];
+
+        $providers = [
+            new VhsPictureProvider($baseInformation),
+            new FalProvider($baseInformation),
+        ];
+
+        foreach ($configurations as $configuration) {
+            $item = $configuration['config'];
+
+            foreach ($providers as $provider) {
+                /** @var $provider AbstractProvider */
+                if ($provider->getProviderIdentifier() === $configuration['source']) {
+                    $value = $provider->getProviderInformation($item);
+                    if (strlen($value)) {
+                        return $value;
+                    }
+                }
+            }
+
+            switch ($configuration['source']) {
                 case 'falref':
                     if ($falReferenceInfo[$item] && strlen(trim($falReferenceInfo[$item]))) {
                         return trim($falReferenceInfo[$item]);
-                    }
-                    break;
-                case 'fal':
-                    if ($falInfo[$item] && strlen(trim($falInfo[$item]))) {
-                        return trim($falInfo[$item]);
                     }
                     break;
                 case 'falmeta':
@@ -377,6 +393,26 @@ class RealUrlImage extends ContentObjectRenderer
     }
 
     /**
+     * Get configurations
+     *
+     * @return array
+     */
+    protected function getConfigurationValues()
+    {
+        $configurations = [];
+        $parts = GeneralUtility::trimExplode('//', $this->fl_conf['data'], true);
+        $partSize = sizeof($parts);
+        for ($i = 0; $i < $partSize; $i++) {
+            $innerParts = GeneralUtility::trimExplode(':', $parts[$i], true);
+            $configurations[] = [
+                'source' => array_shift($innerParts),
+                'config' => implode(':', $innerParts),
+            ];
+        }
+        return $configurations;
+    }
+
+    /**
      * @return \FRUIT\FlRealurlImage\Service\FileInformation
      */
     protected function getFileInformation()
@@ -407,17 +443,6 @@ class RealUrlImage extends ContentObjectRenderer
             return $this->currentCobj;
         }
         return GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFALInfo()
-    {
-        if ($fileInformation = $this->getFileInformation()) {
-            return $fileInformation->getByFal($this->image, $this->fileTypeInformation);
-        }
-        return array();
     }
 
     /**

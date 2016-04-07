@@ -6,8 +6,7 @@
 
 namespace FRUIT\FlRealurlImage\Xclass\Vhs\ViewHelpers\Media;
 
-use FRUIT\FlRealurlImage\RealUrlImage;
-use TYPO3\CMS\Extbase\Utility\DebuggerUtility;
+use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 
 /**
  * VHS PictureViewHelper
@@ -17,15 +16,14 @@ class PictureViewHelper extends \FluidTYPO3\Vhs\ViewHelpers\Media\PictureViewHel
 
     public function render()
     {
-
         $properties = [
             'src'   => $this->arguments['src'],
             'alt'   => $this->arguments['alt'],
             'title' => $this->arguments['title'],
         ];
-        RealUrlImage::setViewHelperInformation($properties);
+        VhsPictureProvider::setViewHelperInformation($properties);
         $return = parent::render();
-        RealUrlImage::resetViewHelperInformation();
+        VhsPictureProvider::setViewHelperInformation([]);
         return $return;
     }
 
