@@ -10,6 +10,7 @@ namespace FRUIT\FlRealurlImage;
 
 use FRUIT\FlRealurlImage\Provider\AbstractProvider;
 use FRUIT\FlRealurlImage\Provider\FalProvider;
+use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -322,8 +323,6 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function generateTextBase()
     {
-        // get info to image
-        $pageInfo = $this->getPAGEinfo();
         $falInfoMeta = $this->getFALMetaInfo();
         $falReferenceInfo = $this->getFALReferenceInfo();
 
@@ -337,6 +336,7 @@ class RealUrlImage extends ContentObjectRenderer
         $providers = [
             new VhsPictureProvider($baseInformation),
             new FalProvider($baseInformation),
+            new PageProvider($baseInformation),
         ];
 
         foreach ($configurations as $configuration) {
@@ -380,11 +380,6 @@ class RealUrlImage extends ContentObjectRenderer
                 case 'file':
                     if ($this->image[$item] && strlen(trim($this->image[$item]))) {
                         return trim($this->image[$item]);
-                    }
-                    break;
-                case 'page':
-                    if ($pageInfo[$item] && strlen(trim($pageInfo[$item]))) {
-                        return trim($pageInfo[$item]);
                     }
                     break;
             }
@@ -454,20 +449,6 @@ class RealUrlImage extends ContentObjectRenderer
             return $fileInformation->getByFalMetaData($this->image, $this->fileTypeInformation);
         }
         return array();
-    }
-
-    /**
-     * get (meta) info for the current Page
-     *
-     * @param       nothing
-     *
-     * @return        array        (meta) info from page
-     */
-    protected function getPAGEinfo()
-    {
-        $rootLineDepth = sizeof($GLOBALS['TSFE']->tmpl->rootLine);
-        $pageInfo = $GLOBALS['TSFE']->tmpl->rootLine[$rootLineDepth - 1];
-        return $pageInfo;
     }
 
     /**
