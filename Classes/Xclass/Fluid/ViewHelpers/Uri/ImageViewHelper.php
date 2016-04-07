@@ -7,6 +7,7 @@
 
 namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers\Uri;
 
+use FRUIT\FlRealurlImage\Service\ImageService;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Extbase\Domain\Model\AbstractFileFolder;
 
@@ -47,7 +48,7 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         $maxHeight = null,
         $treatIdAsReference = false
     ) {
-        $this->imageService = $this->objectManager->get('FRUIT\\FlRealurlImage\\Service\\ImageService');
+        $this->imageService = $this->objectManager->get(ImageService::class);
         try {
             $return = parent::render($src, $image, $width, $height, $minWidth, $minHeight, $maxWidth, $maxHeight,
                 $treatIdAsReference);

@@ -51,9 +51,9 @@ class VhsPictureProvider extends AbstractProvider
 
         list($source, $field) = explode(':', $key);
         if ($source === 'fal') {
-            $provider = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Provider\\FalProvider', ['file' => $file]);
+            $provider = GeneralUtility::makeInstance(FalProvider::class, ['file' => $file]);
         } elseif ($source === 'falmeta') {
-            $provider = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Provider\\FalMetaProvider', ['file' => $file]);
+            $provider = GeneralUtility::makeInstance(FalMetaProvider::class, ['file' => $file]);
         } else {
             return '';
         }

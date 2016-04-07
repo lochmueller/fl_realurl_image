@@ -51,7 +51,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
 
         // call fl_realurl_image to generate $new_fileName
         /** @var RealUrlImage $tx_flrealurlimage */
-        $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
         $tx_flrealurlimage->start(null, null);
         if ($image instanceof ProcessedFile) {
             $info = array(3 => $imageUrl);

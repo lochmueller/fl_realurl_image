@@ -7,7 +7,7 @@
 
 namespace FRUIT\FlRealurlImage\Service;
 
-use FRUIT\FlRealurlImage\Xclass\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Resource\ResourceFactory;
@@ -43,27 +43,11 @@ class FileInformation
     /**
      * Get information from the fal record of the current rendering
      *
-     * @param array $imageInformation
-     * @param mixed $imageInformation
-     *
-     * @return array
-     */
-    public function getByFalMetaData($imageInformation, $fileTypeInformation)
-    {
-        if ($imageInformation['originalFile'] instanceof File) {
-            return $imageInformation['originalFile']->_getMetaData();
-        }
-        return array();
-    }
-
-    /**
-     * Get information from the fal record of the current rendering
-     *
      * @param array                                                    $imageInformation
      *
      * @param                                                          $file
      * @param                                                          $conf
-     * @param  \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer $cObj
+     * @param  ContentObjectRenderer                                   $cObj
      *
      * @return array
      */

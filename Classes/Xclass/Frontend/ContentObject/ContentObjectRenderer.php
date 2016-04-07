@@ -24,7 +24,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
     /**
      * Rendering the cObject, IMG_RESOURCE
      *
-     * @param    array        Array of TypoScript properties
+     * @param    array $conf
      *
      * @return    string        Output
      * @link http://typo3.org/doc.0.html?&tx_extrepmgm_pi1[extUid]=270&tx_extrepmgm_pi1[tocEl]=354&cHash=46f9299706
@@ -38,7 +38,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         // ## Here begins RealUrl_image ######
         // ###################################
         /** @var RealUrlImage $tx_flrealurlimage */
-        $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
         $tx_flrealurlimage->start($this->data, $this->table);
         $new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
         $imageResource = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
@@ -111,7 +111,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             // ###################################
             // ## Here begins RealUrl_image ######
             // ###################################
-            $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+            $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
             $tx_flrealurlimage->start($this->data, $this->table);
             $new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
             $imageTagValues['src'] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;
@@ -250,7 +250,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         // ###################################
         // ## Here begins RealUrl_image ######
         // ###################################
-        $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
         /** @var $tx_flrealurlimage \FRUIT\FlRealurlImage\RealUrlImage */
         $tx_flrealurlimage->start($this->data, $this->table);
         $new_fileName = $tx_flrealurlimage->main([], $result, $file, $this);

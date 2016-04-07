@@ -33,10 +33,14 @@ class FalProvider extends AbstractProvider
     public function getProviderInformation($key)
     {
         if (isset($this->baseInformation['image']['originalFile']) && $this->baseInformation['image']['originalFile'] instanceof File) {
-            $information = $this->baseInformation['image']['originalFile']->getProperties();
+            $file = $this->baseInformation['image']['originalFile'];
         } elseif (isset($this->baseInformation['file']) && $this->baseInformation['file'] instanceof File) {
-            $information = $this->baseInformation['file']->getProperties();
+            $file = $this->baseInformation['file'];
+        } else {
+            return '';
         }
+        /** @var File $file */
+        $information = $file->getProperties();
         return isset($information[$key]) ? trim($information[$key]) : '';
     }
 }

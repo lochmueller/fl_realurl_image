@@ -13,6 +13,8 @@ use FRUIT\FlRealurlImage\Provider\FalMetaProvider;
 use FRUIT\FlRealurlImage\Provider\FalProvider;
 use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
+use FRUIT\FlRealurlImage\Service\FileInformation;
+use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -34,7 +36,7 @@ class RealUrlImage extends ContentObjectRenderer
     protected $IMAGE_conf = array();
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+     * @var ContentObjectRenderer
      */
     protected $currentCobj = null;
 
@@ -103,7 +105,7 @@ class RealUrlImage extends ContentObjectRenderer
     public function __construct()
     {
         $objectManager = new ObjectManager();
-        $this->configuration = $objectManager->get('FRUIT\\FlRealurlImage\\Configuration');
+        $this->configuration = $objectManager->get(Configuration::class);
     }
 
     /**
@@ -324,7 +326,6 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function generateTextBase()
     {
-        $falInfoMeta = $this->getFALMetaInfo();
         $falReferenceInfo = $this->getFALReferenceInfo();
 
         $configurations = $this->getConfigurationValues();
@@ -405,11 +406,11 @@ class RealUrlImage extends ContentObjectRenderer
     }
 
     /**
-     * @return \FRUIT\FlRealurlImage\Service\FileInformation
+     * @return FileInformation
      */
     protected function getFileInformation()
     {
-        return GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\Service\\FileInformation');
+        return GeneralUtility::makeInstance(FileInformation::class);
     }
 
     /**
@@ -427,25 +428,14 @@ class RealUrlImage extends ContentObjectRenderer
     /**
      * Get a valid cObj
      *
-     * @return \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+     * @return ContentObjectRenderer
      */
     protected function getCObj()
     {
         if (is_object($this->currentCobj)) {
             return $this->currentCobj;
         }
-        return GeneralUtility::makeInstance('TYPO3\\CMS\\Frontend\\ContentObject\\ContentObjectRenderer');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFALMetaInfo()
-    {
-        if ($fileInformation = $this->getFileInformation()) {
-            return $fileInformation->getByFalMetaData($this->image, $this->fileTypeInformation);
-        }
-        return array();
+        return GeneralUtility::makeInstance(ContentObjectRenderer::class);
     }
 
     /**
@@ -710,9 +700,9 @@ class RealUrlImage extends ContentObjectRenderer
         if ($cache !== null) {
             return $cache;
         }
-        /** @var \TYPO3\CMS\Core\Cache\CacheManager $cacheManager */
+        /** @var CacheManager $cacheManager */
         $objectManager = new ObjectManager();
-        $cacheManager = $objectManager->get('TYPO3\\CMS\\Core\\Cache\\CacheManager');
+        $cacheManager = $objectManager->get(CacheManager::class);
         $cache = $cacheManager->getCache('fl_realurl_image');
         return $cache;
     }
