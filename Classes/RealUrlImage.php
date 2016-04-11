@@ -13,6 +13,7 @@ use FRUIT\FlRealurlImage\Provider\FalMetaProvider;
 use FRUIT\FlRealurlImage\Provider\FalProvider;
 use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
+use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
 use FRUIT\FlRealurlImage\Service\FileInformation;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -80,24 +81,6 @@ class RealUrlImage extends ContentObjectRenderer
      * @var Configuration
      */
     protected $configuration = null;
-
-    static protected $viewHelperInformation = null;
-
-    /**
-     * @param $information
-     */
-    public static function setViewHelperInformation(array $information)
-    {
-        self::$viewHelperInformation = $information;
-    }
-
-    /**
-     *
-     */
-    public static function resetViewHelperInformation()
-    {
-        self::$viewHelperInformation = null;
-    }
 
     /**
      * Build up the object
@@ -340,6 +323,7 @@ class RealUrlImage extends ContentObjectRenderer
             new FalProvider($baseInformation),
             new PageProvider($baseInformation),
             new FalMetaProvider($baseInformation),
+            new ViewHelperProvider($baseInformation),
         ];
 
         foreach ($configurations as $configuration) {
@@ -359,11 +343,6 @@ class RealUrlImage extends ContentObjectRenderer
                 case 'falref':
                     if ($falReferenceInfo[$item] && strlen(trim($falReferenceInfo[$item]))) {
                         return trim($falReferenceInfo[$item]);
-                    }
-                    break;
-                case 'vh':
-                    if (self::$viewHelperInformation !== null && isset(self::$viewHelperInformation[$item]) && trim(self::$viewHelperInformation[$item]) !== '') {
-                        return trim(self::$viewHelperInformation[$item]);
                     }
                     break;
                 case 'ts':

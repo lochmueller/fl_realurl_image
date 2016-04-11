@@ -7,6 +7,7 @@
 
 namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers;
 
+use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
 use FRUIT\FlRealurlImage\RealUrlImage;
 use FRUIT\FlRealurlImage\Service\ImageService;
 use TYPO3\CMS\Core\Resource\FileInterface;
@@ -52,15 +53,15 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
         $crop = null
     ) {
         $this->imageService = $this->objectManager->get(ImageService::class);
-        RealUrlImage::setViewHelperInformation(array('alt' => $this->arguments['alt']));
+        ViewHelperProvider::setViewHelperInformation(array('alt' => $this->arguments['alt']));
         try {
             $return = parent::render($src, $width, $height, $minWidth, $minHeight, $maxWidth, $maxHeight, $treatIdAsReference,
                 $image, $crop);
         } catch (\Exception $ex) {
-            RealUrlImage::resetViewHelperInformation();
+            ViewHelperProvider::resetViewHelperInformation();
             throw $ex;
         }
-        RealUrlImage::resetViewHelperInformation();
+        ViewHelperProvider::resetViewHelperInformation();
         return $return;
     }
 }
