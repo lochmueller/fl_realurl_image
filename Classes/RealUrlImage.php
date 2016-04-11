@@ -11,7 +11,10 @@ namespace FRUIT\FlRealurlImage;
 use FRUIT\FlRealurlImage\Provider\AbstractProvider;
 use FRUIT\FlRealurlImage\Provider\FalMetaProvider;
 use FRUIT\FlRealurlImage\Provider\FalProvider;
+use FRUIT\FlRealurlImage\Provider\FalReferenceProvider;
+use FRUIT\FlRealurlImage\Provider\FileProvider;
 use FRUIT\FlRealurlImage\Provider\PageProvider;
+use FRUIT\FlRealurlImage\Provider\TypoScriptProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
 use FRUIT\FlRealurlImage\Service\FileInformation;
@@ -309,13 +312,14 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function generateTextBase()
     {
-        $falReferenceInfo = $this->getFALReferenceInfo();
 
         $configurations = $this->getConfigurationValues();
 
         $baseInformation = [
             'image'               => $this->image,
             'fileTypeInformation' => $this->fileTypeInformation,
+            'IMAGE_conf'          => $this->IMAGE_conf,
+            'cObj'                => $this->getCObj(),
         ];
 
         $providers = [
@@ -324,6 +328,9 @@ class RealUrlImage extends ContentObjectRenderer
             new PageProvider($baseInformation),
             new FalMetaProvider($baseInformation),
             new ViewHelperProvider($baseInformation),
+            new FalReferenceProvider($baseInformation),
+            new TypoScriptProvider($baseInformation),
+            new FileProvider($baseInformation),
         ];
 
         foreach ($configurations as $configuration) {
@@ -337,28 +344,6 @@ class RealUrlImage extends ContentObjectRenderer
                         return $value;
                     }
                 }
-            }
-
-            switch ($configuration['source']) {
-                case 'falref':
-                    if ($falReferenceInfo[$item] && strlen(trim($falReferenceInfo[$item]))) {
-                        return trim($falReferenceInfo[$item]);
-                    }
-                    break;
-                case 'ts':
-                    if ($this->IMAGE_conf[$item] || $this->IMAGE_conf[$item . '.']) {
-                        $tsResult = $this->getCObj()
-                            ->stdWrap($this->IMAGE_conf[$item], $this->IMAGE_conf[$item . '.']);
-                        if (strlen(trim($tsResult))) {
-                            return trim($tsResult);
-                        }
-                    }
-                    break;
-                case 'file':
-                    if ($this->image[$item] && strlen(trim($this->image[$item]))) {
-                        return trim($this->image[$item]);
-                    }
-                    break;
             }
         }
         return '';
@@ -382,26 +367,6 @@ class RealUrlImage extends ContentObjectRenderer
             ];
         }
         return $configurations;
-    }
-
-    /**
-     * @return FileInformation
-     */
-    protected function getFileInformation()
-    {
-        return GeneralUtility::makeInstance(FileInformation::class);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFALReferenceInfo()
-    {
-        if ($fileInformation = $this->getFileInformation()) {
-            return $fileInformation->getByFalReference($this->image, $this->fileTypeInformation, $this->IMAGE_conf,
-                $this->getCObj());
-        }
-        return array();
     }
 
     /**
