@@ -63,7 +63,8 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
         if (strpos($imageUrl, '://')) {
             $uriPrefix = '';
         } elseif ($this->environmentService->isEnvironmentInFrontendMode()) {
-            $uriPrefix = $GLOBALS['TSFE']->absRefPrefix;
+            $imageUrl = $tx_flrealurlimage->addAbsRefPrefix($imageUrl);
+            $uriPrefix = '';
         } else {
             $uriPrefix = GeneralUtility::getIndpEnv('TYPO3_SITE_PATH');
         }

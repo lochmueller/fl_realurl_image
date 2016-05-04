@@ -165,6 +165,9 @@ class RealUrlImage extends ContentObjectRenderer
      */
     public function addAbsRefPrefix($url)
     {
+        if (strpos($url, 'http://') !== false || strpos($url, 'https://') !== false) {
+            return $url;
+        }
         return htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . ltrim($url, '/');
     }
 

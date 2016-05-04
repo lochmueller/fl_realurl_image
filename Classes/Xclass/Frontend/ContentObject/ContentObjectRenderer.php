@@ -114,7 +114,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
             $tx_flrealurlimage->start($this->data, $this->table);
             $new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
-            $imageTagValues['src'] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;
+            $imageTagValues['src'] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
             // ##################################
             // ### Here ends RealURL_Image ######
             // ##################################
@@ -193,7 +193,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
         $tx_flrealurlimage->start($this->data, $this->table);
         $new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
-        $imageTagValues['src'] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;
+        $imageTagValues['src'] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
         // ##################################
         // ### Here ends RealURL_Image ######
         // ##################################
@@ -254,7 +254,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         /** @var $tx_flrealurlimage \FRUIT\FlRealurlImage\RealUrlImage */
         $tx_flrealurlimage->start($this->data, $this->table);
         $new_fileName = $tx_flrealurlimage->main([], $result, $file, $this);
-        $result[3] = htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . $new_fileName;
+        $result[3] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
         // ##################################
         // ### Here ends RealURL_Image ######
         // ##################################
