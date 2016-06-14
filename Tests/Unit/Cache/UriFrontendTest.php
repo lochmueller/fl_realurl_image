@@ -19,7 +19,7 @@ class UriFrontendTest extends UnitTestCase
      */
     public function cacheIdentifierIsAlwaysValid()
     {
-        $cacheFrontend = new UriFrontend();
+        $cacheFrontend = new UriFrontend('test');
         $this->assertEquals(true, $cacheFrontend->isValidEntryIdentifier('Strange code here'));
     }
 }
