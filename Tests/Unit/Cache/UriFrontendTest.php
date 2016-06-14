@@ -6,6 +6,7 @@
 namespace FRUIT\FlRealurlImage\Tests\Unit\Cache;
 
 use FRUIT\FlRealurlImage\Cache\UriFrontend;
+use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -19,7 +20,8 @@ class UriFrontendTest extends UnitTestCase
      */
     public function cacheIdentifierIsAlwaysValid()
     {
-        $cacheFrontend = new UriFrontend('test');
+        $dbBackend = new Typo3DatabaseBackend('Production');
+        $cacheFrontend = new UriFrontend('test', $dbBackend);
         $this->assertEquals(true, $cacheFrontend->isValidEntryIdentifier('Strange code here'));
     }
 }
