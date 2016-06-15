@@ -33,5 +33,4 @@ class SourceViewHelper extends \FluidTYPO3\Vhs\ViewHelpers\Media\SourceViewHelpe
         VhsPictureProvider::setViewHelperInformation($before);
         return $return;
     }
-
 }

@@ -416,8 +416,10 @@ class RealUrlImage extends ContentObjectRenderer
         // smartEncoding
         if ($this->fl_conf['smartEncoding']) {
             $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
-            $textBase = $GLOBALS['TSFE']->csConvObj->specCharsToASCII($charset,
-                $textBase); // Convert extended letters to ascii equivalents
+            $textBase = $GLOBALS['TSFE']->csConvObj->specCharsToASCII(
+                $charset,
+                $textBase
+            ); // Convert extended letters to ascii equivalents
             $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
         }
         // spaceCharacter
@@ -443,8 +445,11 @@ class RealUrlImage extends ContentObjectRenderer
         } else {
             $hashBase = PathUtility::pathinfo($this->org_fileName, PATHINFO_BASENAME);
         }
-        $hashLength = isset($this->fl_conf['hashLength']) ? MathUtility::forceIntegerInRange((int)$this->fl_conf['hashLength'], 0,
-            strlen($hashBase)) : 0;
+        $hashLength = isset($this->fl_conf['hashLength']) ? MathUtility::forceIntegerInRange(
+            (int)$this->fl_conf['hashLength'],
+            0,
+            strlen($hashBase)
+        ) : 0;
         if ($hashLength) {
             $textBase .= $this->getSpaceCharacter() . substr($hashBase, 0, $hashLength);
         }
@@ -665,5 +670,4 @@ class RealUrlImage extends ContentObjectRenderer
         $objectContentRender = new ContentObjectRenderer();
         return $objectContentRender->stdWrap($textBase, $this->fl_conf);
     }
-
 }

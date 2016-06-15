@@ -76,8 +76,17 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         } else {
             $this->imageService = $this->objectManager->get(ImageService::class);
             try {
-                $return = parent::render($src, $image, $width, $height, $minWidth, $minHeight, $maxWidth, $maxHeight,
-                    $treatIdAsReference);
+                $return = parent::render(
+                    $src,
+                    $image,
+                    $width,
+                    $height,
+                    $minWidth,
+                    $minHeight,
+                    $maxWidth,
+                    $maxHeight,
+                    $treatIdAsReference
+                );
             } catch (\Exception $ex) {
                 throw $ex;
             }

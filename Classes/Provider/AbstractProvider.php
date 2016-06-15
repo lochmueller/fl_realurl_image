@@ -45,5 +45,4 @@ abstract class AbstractProvider
      * @return string
      */
     abstract public function getProviderInformation($key);
-
 }

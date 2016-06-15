@@ -31,8 +31,10 @@ class TypoScriptProvider extends AbstractProvider
     public function getProviderInformation($key)
     {
         if ($this->baseInformation['IMAGE_conf'][$key] || $this->baseInformation['IMAGE_conf'][$key . '.']) {
-            $tsResult = $this->baseInformation['cObj']->stdWrap($this->baseInformation['IMAGE_conf'][$key],
-                $this->baseInformation['IMAGE_conf'][$key . '.']);
+            $tsResult = $this->baseInformation['cObj']->stdWrap(
+                $this->baseInformation['IMAGE_conf'][$key],
+                $this->baseInformation['IMAGE_conf'][$key . '.']
+            );
             if (strlen(trim($tsResult))) {
                 return trim($tsResult);
             }

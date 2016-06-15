@@ -30,7 +30,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
      * @link http://typo3.org/doc.0.html?&tx_extrepmgm_pi1[extUid]=270&tx_extrepmgm_pi1[tocEl]=354&cHash=46f9299706
      * @see  getImgResource()
      */
-    function IMG_RESOURCE($conf)
+    public function IMG_RESOURCE($conf)
     {
         $GLOBALS['TSFE']->lastImgResourceInfo = $this->getImgResource($conf['file'], $conf['file.']);
 
@@ -56,7 +56,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
      *
      * @return string
      */
-    function cImage($file, $conf)
+    public function cImage($file, $conf)
     {
         if (GeneralUtility::compat_version('7.0')) {
             return $this->cImage7AndUp($file, $conf);
@@ -261,5 +261,4 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
 
         return $result;
     }
-
 }

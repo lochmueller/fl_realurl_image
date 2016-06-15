@@ -26,5 +26,4 @@ class PictureViewHelper extends \FluidTYPO3\Vhs\ViewHelpers\Media\PictureViewHel
         VhsPictureProvider::setViewHelperInformation([]);
         return $return;
     }
-
 }

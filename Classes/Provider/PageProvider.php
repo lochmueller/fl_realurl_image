@@ -15,7 +15,7 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 class PageProvider extends AbstractProvider
 {
 
-    static $pageInformation = null;
+    public static $pageInformation = null;
 
     /**
      * Get the provider identifier

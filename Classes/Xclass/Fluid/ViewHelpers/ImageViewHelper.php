@@ -55,8 +55,18 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
         $this->imageService = $this->objectManager->get(ImageService::class);
         ViewHelperProvider::setViewHelperInformation(array('alt' => $this->arguments['alt']));
         try {
-            $return = parent::render($src, $width, $height, $minWidth, $minHeight, $maxWidth, $maxHeight, $treatIdAsReference,
-                $image, $crop);
+            $return = parent::render(
+                $src,
+                $width,
+                $height,
+                $minWidth,
+                $minHeight,
+                $maxWidth,
+                $maxHeight,
+                $treatIdAsReference,
+                $image,
+                $crop
+            );
         } catch (\Exception $ex) {
             ViewHelperProvider::resetViewHelperInformation();
             throw $ex;

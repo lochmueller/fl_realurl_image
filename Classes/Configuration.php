@@ -49,5 +49,4 @@ class Configuration
         return $extensionConfiguration;
 
     }
-
 }

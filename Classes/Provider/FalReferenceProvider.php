@@ -46,9 +46,12 @@ class FalReferenceProvider extends AbstractProvider
     protected function getFALReferenceInfo()
     {
         if ($fileInformation = $this->getFileInformation()) {
-            return $fileInformation->getByFalReference($this->baseInformation['image'],
-                $this->baseInformation['fileTypeInformation'], $this->baseInformation['IMAGE_conf'],
-                $this->baseInformation['cObj']);
+            return $fileInformation->getByFalReference(
+                $this->baseInformation['image'],
+                $this->baseInformation['fileTypeInformation'],
+                $this->baseInformation['IMAGE_conf'],
+                $this->baseInformation['cObj']
+            );
         }
         return array();
     }
@@ -60,5 +63,4 @@ class FalReferenceProvider extends AbstractProvider
     {
         return GeneralUtility::makeInstance(FileInformation::class);
     }
-
 }

@@ -90,5 +90,4 @@ class FileInformation
 
         return array();
     }
-
 }

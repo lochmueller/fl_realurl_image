@@ -94,5 +94,4 @@ class VhsPictureProvider extends AbstractProvider
     {
         self::$viewHelperInformation = $viewHelperInformation;
     }
-
 }

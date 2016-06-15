@@ -26,7 +26,7 @@ class TypoScriptFrontend
      *
      * @return    void
      */
-    function checkImageDecode(&$params, &$ref)
+    public function checkImageDecode(&$params, &$ref)
     {
         $realurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
         $realurlimage->showImage();
