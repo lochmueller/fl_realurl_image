@@ -256,7 +256,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             return $result;
         }
 
-        if(!$this->skipRealUrlImageInGetImgResource){
+        if (!$this->skipRealUrlImageInGetImgResource) {
             // ###################################
             // ## Here begins RealUrl_image ######
             // ###################################

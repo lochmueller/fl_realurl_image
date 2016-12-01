@@ -47,6 +47,5 @@ class Configuration
             $extensionConfiguration = array();
         }
         return $extensionConfiguration;
-
     }
 }
