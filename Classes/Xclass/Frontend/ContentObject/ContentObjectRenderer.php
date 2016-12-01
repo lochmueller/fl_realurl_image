@@ -20,6 +20,13 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
 {
+    /**
+     * Skips RealUrlImage execution in getImgResource method.
+     * Otherwise RealUrlImage is executed twice in IMG_RESOURCE, cImage and cImage7AndUp
+     *
+     * @var boolean
+     */
+    protected $skipRealUrlImageInGetImgResource = false;
 
     /**
      * Rendering the cObject, IMG_RESOURCE
@@ -32,6 +39,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
      */
     public function IMG_RESOURCE($conf)
     {
+        $this->skipRealUrlImageInGetImgResource = true;
         $GLOBALS['TSFE']->lastImgResourceInfo = $this->getImgResource($conf['file'], $conf['file.']);
 
         // ###################################
@@ -62,6 +70,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             return $this->cImage7AndUp($file, $conf);
         }
 
+        $this->skipRealUrlImageInGetImgResource = true;
         $info = $this->getImgResource($file, $conf['file.']);
         $GLOBALS['TSFE']->lastImageInfo = $info;
 
@@ -153,6 +162,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
     public function cImage7AndUp($file, $conf)
     {
         $tsfe = $this->getTypoScriptFrontendController();
+        $this->skipRealUrlImageInGetImgResource = true;
         $info = $this->getImgResource($file, $conf['file.']);
         $tsfe->lastImageInfo = $info;
         if (!is_array($info)) {
@@ -242,22 +252,23 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
     public function getImgResource($file, $fileArray)
     {
         $result = parent::getImgResource($file, $fileArray);
-
         if (!is_array($result)) {
             return $result;
         }
 
-        // ###################################
-        // ## Here begins RealUrl_image ######
-        // ###################################
-        $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
-        /** @var $tx_flrealurlimage \FRUIT\FlRealurlImage\RealUrlImage */
-        $tx_flrealurlimage->start($this->data, $this->table);
-        $new_fileName = $tx_flrealurlimage->main([], $result, $file, $this);
-        $result[3] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
-        // ##################################
-        // ### Here ends RealURL_Image ######
-        // ##################################
+        if(!$this->skipRealUrlImageInGetImgResource){
+            // ###################################
+            // ## Here begins RealUrl_image ######
+            // ###################################
+            $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
+            /** @var $tx_flrealurlimage \FRUIT\FlRealurlImage\RealUrlImage */
+            $tx_flrealurlimage->start($this->data, $this->table);
+            $new_fileName = $tx_flrealurlimage->main([], $result, $file, $this);
+            $result[3] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
+            // ##################################
+            // ### Here ends RealURL_Image ######
+            // ##################################
+        }
 
         return $result;
     }
