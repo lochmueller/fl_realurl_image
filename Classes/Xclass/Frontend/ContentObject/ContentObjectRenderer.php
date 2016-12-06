@@ -39,7 +39,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
      */
     public function IMG_RESOURCE($conf)
     {
-        $this->skipRealUrlImageInGetImgResource = true;
+        $this->setSkipRealUrlImageInGetImgResource(true);
         $GLOBALS['TSFE']->lastImgResourceInfo = $this->getImgResource($conf['file'], $conf['file.']);
 
         // ###################################
@@ -70,7 +70,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             return $this->cImage7AndUp($file, $conf);
         }
 
-        $this->skipRealUrlImageInGetImgResource = true;
+        $this->setSkipRealUrlImageInGetImgResource(true);
         $info = $this->getImgResource($file, $conf['file.']);
         $GLOBALS['TSFE']->lastImageInfo = $info;
 
@@ -162,7 +162,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
     public function cImage7AndUp($file, $conf)
     {
         $tsfe = $this->getTypoScriptFrontendController();
-        $this->skipRealUrlImageInGetImgResource = true;
+        $this->setSkipRealUrlImageInGetImgResource(true);
         $info = $this->getImgResource($file, $conf['file.']);
         $tsfe->lastImageInfo = $info;
         if (!is_array($info)) {
@@ -271,5 +271,13 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         }
 
         return $result;
+    }
+
+    /**
+     * Set skipRealUrlImageInGetImgResource
+     * @param $skipRealUrlImageInGetImgResource
+     */
+    public function setSkipRealUrlImageInGetImgResource($skipRealUrlImageInGetImgResource){
+        $this->skipRealUrlImageInGetImgResource = $skipRealUrlImageInGetImgResource;
     }
 }
