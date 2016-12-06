@@ -28,13 +28,14 @@ class ImageResourceContentObject extends \TYPO3\CMS\Frontend\ContentObject\Image
      */
     public function render($conf = array())
     {
+        $this->cObj->setSkipRealUrlImageInGetImgResource(true);
         $GLOBALS['TSFE']->lastImgResourceInfo = $this->cObj->getImgResource($conf['file'], $conf['file.']);
 
         // ###################################
         // ## Here begins RealUrl_image ######
         // ###################################
         if (is_array($GLOBALS['TSFE']->lastImgResourceInfo)) {
-            // call fl_realurl_image to generate $new_fileName
+            /** @var RealUrlImage $tx_flrealurlimage */
             $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
             $tx_flrealurlimage->start(null, null);
             $new_fileName = $tx_flrealurlimage->main($conf, $GLOBALS['TSFE']->lastImgResourceInfo);
@@ -42,18 +43,20 @@ class ImageResourceContentObject extends \TYPO3\CMS\Frontend\ContentObject\Image
             // generate the image URL
             $theValue = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
             // stdWrap and return
-            return $this->getContentObject()
-                ->stdWrap($theValue, $conf['stdWrap.']);
+            return $this->cObj->stdWrap($theValue, $conf['stdWrap.']);
         }
         // ##################################
         // ### Here ends RealURL_Image ######
         // ##################################
 
-
-        $imageResource = $GLOBALS['TSFE']->lastImgResourceInfo[3];
-
-        $theValue = isset($conf['stdWrap.']) ? $this->cObj->stdWrap($imageResource, $conf['stdWrap.']) : $imageResource;
+        if ($GLOBALS['TSFE']->lastImgResourceInfo) {
+            $imageResource = $GLOBALS['TSFE']->lastImgResourceInfo[3];
+            $theValue = isset($conf['stdWrap.']) ? $this->cObj->stdWrap($imageResource, $conf['stdWrap.']) : $imageResource;
+        } else {
+            $theValue = '';
+        }
 
         return $theValue;
     }
+
 }
