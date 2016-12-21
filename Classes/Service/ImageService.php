@@ -41,11 +41,11 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      * Get public url of image depending on the environment
      *
      * @param FileInterface $image
-     *
+     * @param bool|FALSE $absolute Force absolute URL
      * @return string
      * @api
      */
-    public function getImageUri(FileInterface $image)
+    public function getImageUri(FileInterface $image, $absolute = false)
     {
         $imageUrl = $image->getPublicUrl();
 
@@ -59,16 +59,27 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
         }
         $this->imageForRealName = null;
 
-        // no prefix in case of an already fully qualified URL (having a schema)
-        if (strpos($imageUrl, '://')) {
+        $parsedUrl = parse_url($imageUrl);
+        // no prefix in case of an already fully qualified URL
+        if (isset($parsedUrl['host'])) {
             $uriPrefix = '';
         } elseif ($this->environmentService->isEnvironmentInFrontendMode()) {
             $imageUrl = $tx_flrealurlimage->addAbsRefPrefix($imageUrl);
             $uriPrefix = '';
+            $parsedUrl = parse_url($imageUrl);
         } else {
             $uriPrefix = GeneralUtility::getIndpEnv('TYPO3_SITE_PATH');
         }
 
-        return $uriPrefix . $imageUrl;
+        if ($absolute) {
+            // If full URL has no scheme we add the same scheme as used by the site
+            // so we have an absolute URL also usable outside of browser scope (e.g. in an email message)
+            if (isset($parsedUrl['host']) && !isset($parsedUrl['scheme'])) {
+                $uriPrefix = (GeneralUtility::getIndpEnv('TYPO3_SSL') ? 'https:' : 'http:') . $uriPrefix;
+            }
+            return GeneralUtility::locationHeaderUrl($uriPrefix . $imageUrl);
+        } else {
+            return $uriPrefix . $imageUrl;
+        }
     }
 }
