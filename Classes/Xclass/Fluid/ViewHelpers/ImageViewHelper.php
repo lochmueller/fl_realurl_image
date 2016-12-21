@@ -36,6 +36,7 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
      * @param bool                             $treatIdAsReference given src argument is a sys_file_reference record
      * @param FileInterface|AbstractFileFolder $image              a FAL object
      * @param string|bool                      $crop               overrule cropping of image (setting to FALSE disables the cropping set in FileReference)
+     * @param bool                             $absolute           Force absolute URL
      *
      * @return string
      * @throws \Exception
@@ -50,7 +51,8 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
         $maxHeight = null,
         $treatIdAsReference = false,
         $image = null,
-        $crop = null
+        $crop = null,
+        $absolute = false
     ) {
         $this->imageService = $this->objectManager->get(ImageService::class);
         ViewHelperProvider::setViewHelperInformation(array('alt' => $this->arguments['alt']));
@@ -65,7 +67,8 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
                 $maxHeight,
                 $treatIdAsReference,
                 $image,
-                $crop
+                $crop,
+                $absolute
             );
         } catch (\Exception $ex) {
             ViewHelperProvider::resetViewHelperInformation();
