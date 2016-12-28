@@ -28,8 +28,7 @@
   ],
   "require": {
     "php": ">=5.5.0",
-    "typo3/cms-core": "~6.2.0||~7.6.0||~8.1.0||dev-master",
-    "typo3/cms": "^7.6.0"
+    "typo3/cms-core": "~6.2.0||~7.6.0||~8.0||dev-master"
   },
   "replace": {
     "fl_realurl_image": "self.version",
@@ -41,10 +40,11 @@
     "issues": "https://github.com/lochmueller/fl_realurl_image/issues"
   },
   "require-dev": {
-    "namelesscoder/typo3-repository-client": "1.1.x-dev",
+    "namelesscoder/typo3-repository-client": "1.2.0",
     "phpunit/phpunit": "~4.8.0",
     "squizlabs/php_codesniffer": "^2.6",
-    "phpmd/phpmd": "^2.4"
+    "phpmd/phpmd": "^2.4",
+    "scrutinizer/ocular": "^1.3.0"
   },
   "config": {
     "vendor-dir": ".Build/vendor",
