@@ -59,39 +59,19 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         $crop = null,
         $absolute = false
     ) {
-        if (GeneralUtility::compat_version('7.6')) {
-            return self::renderStatic([
-                'src'                => $src,
-                'image'              => $image,
-                'width'              => $width,
-                'height'             => $height,
-                'minWidth'           => $minWidth,
-                'minHeight'          => $minHeight,
-                'maxWidth'           => $maxWidth,
-                'maxHeight'          => $maxHeight,
-                'treatIdAsReference' => $treatIdAsReference,
-                'crop'               => $crop,
-                'absolute'           => $absolute,
-            ], $this->buildRenderChildrenClosure(), $this->renderingContext);
-        } else {
-            $this->imageService = $this->objectManager->get(ImageService::class);
-            try {
-                $return = parent::render(
-                    $src,
-                    $image,
-                    $width,
-                    $height,
-                    $minWidth,
-                    $minHeight,
-                    $maxWidth,
-                    $maxHeight,
-                    $treatIdAsReference
-                );
-            } catch (\Exception $ex) {
-                throw $ex;
-            }
-            return $return;
-        }
+        return self::renderStatic([
+            'src'                => $src,
+            'image'              => $image,
+            'width'              => $width,
+            'height'             => $height,
+            'minWidth'           => $minWidth,
+            'minHeight'          => $minHeight,
+            'maxWidth'           => $maxWidth,
+            'maxHeight'          => $maxHeight,
+            'treatIdAsReference' => $treatIdAsReference,
+            'crop'               => $crop,
+            'absolute'           => $absolute,
+        ], $this->buildRenderChildrenClosure(), $this->renderingContext);
     }
 
     /**
