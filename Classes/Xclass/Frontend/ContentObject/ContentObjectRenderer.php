@@ -277,7 +277,8 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
      * Set skipRealUrlImageInGetImgResource
      * @param $skipRealUrlImageInGetImgResource
      */
-    public function setSkipRealUrlImageInGetImgResource($skipRealUrlImageInGetImgResource){
+    public function setSkipRealUrlImageInGetImgResource($skipRealUrlImageInGetImgResource)
+    {
         $this->skipRealUrlImageInGetImgResource = $skipRealUrlImageInGetImgResource;
     }
 }

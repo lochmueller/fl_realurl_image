@@ -58,5 +58,4 @@ class ImageResourceContentObject extends \TYPO3\CMS\Frontend\ContentObject\Image
 
         return $theValue;
     }
-
 }
