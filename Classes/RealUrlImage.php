@@ -17,7 +17,6 @@ use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\TypoScriptProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
-use FRUIT\FlRealurlImage\Service\FileInformation;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
@@ -548,21 +547,19 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @param        string $org_path the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
      * @param        string $new_path the path to the new image
-     *
-     * @return      NULL
      */
     protected function deleteFileCache($org_path, $new_path)
     {
-        if (TYPO3_OS == 'WIN') {
-            if (is_file($new_path) && (md5_file($org_path) != md5_file($new_path))) {
+        if (TYPO3_OS !== 'WIN') {
+            $new_path = PATH_site . $new_path;
+            $org_path = PATH_site . $org_path;
+        }
+
+        if (is_file($new_path) && is_file($org_path)) {
+            if (md5_file($new_path) != md5_file($org_path)) {
                 unlink($new_path);
             }
-        } else {
-            if (is_file(PATH_site . $new_path) && (md5_file(PATH_site . $org_path) != md5_file(PATH_site . $new_path))) {
-                unlink(PATH_site . $new_path);
-            }
         }
-        return;
     }
 
     /**
