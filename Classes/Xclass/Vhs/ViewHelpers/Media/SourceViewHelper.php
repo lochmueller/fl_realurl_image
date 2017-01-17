@@ -20,14 +20,14 @@ class SourceViewHelper extends \FluidTYPO3\Vhs\ViewHelpers\Media\SourceViewHelpe
     public function render()
     {
         $before = VhsPictureProvider::getViewHelperInformation();
-        $setup = array(
+        $setup = [
             'width'  => $this->arguments['width'],
             'height' => $this->arguments['height'],
             'minW'   => $this->arguments['minW'],
             'minH'   => $this->arguments['minH'],
             'maxW'   => $this->arguments['maxW'],
             'maxH'   => $this->arguments['maxH']
-        );
+        ];
         VhsPictureProvider::setViewHelperInformation(array_merge($before, $setup));
         $return = parent::render();
         VhsPictureProvider::setViewHelperInformation($before);

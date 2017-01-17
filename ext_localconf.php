@@ -16,8 +16,8 @@ $xClass = [
 ];
 
 if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('vhs')) {
-    $xClass['FluidTYPO3\\Vhs\\ViewHelpers\\Media\\PictureViewHelper'] = \FRUIT\FlRealurlImage\Xclass\Vhs\ViewHelpers\Media\PictureViewHelper::class;
-    $xClass['FluidTYPO3\\Vhs\\ViewHelpers\\Media\\SourceViewHelper'] = \FRUIT\FlRealurlImage\Xclass\Vhs\ViewHelpers\Media\SourceViewHelper::class;
+    $xClass[\FluidTYPO3\Vhs\ViewHelpers\Media\PictureViewHelper::class] = \FRUIT\FlRealurlImage\Xclass\Vhs\ViewHelpers\Media\PictureViewHelper::class;
+    $xClass[\FluidTYPO3\Vhs\ViewHelpers\Media\SourceViewHelper::class] = \FRUIT\FlRealurlImage\Xclass\Vhs\ViewHelpers\Media\SourceViewHelper::class;
 }
 
 foreach ($xClass as $source => $target) {

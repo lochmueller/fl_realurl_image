@@ -38,7 +38,7 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @var array
      */
-    protected $IMAGE_conf = array();
+    protected $IMAGE_conf = [];
 
     /**
      * @var ContentObjectRenderer
@@ -50,21 +50,21 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @var array
      */
-    protected $fl_conf = array();
+    protected $fl_conf = [];
 
     /**
      * image Array of Typo3
      *
      * @var array
      */
-    protected $image = array();
+    protected $image = [];
 
     /**
      * info about the file type
      *
      * @var array
      */
-    protected $fileTypeInformation = array();
+    protected $fileTypeInformation = [];
 
     /*
       - 0: Height
@@ -212,11 +212,11 @@ class RealUrlImage extends ContentObjectRenderer
         $this->currentCobj = $cObj;
 
         // fl_conf
-        $global_conf = array();
+        $global_conf = [];
         if (is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'])) {
             $global_conf = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'];
         }
-        $local_conf = array();
+        $local_conf = [];
         if (is_array($conf['fl_realurl_image.'])) {
             $local_conf = $conf['fl_realurl_image.'];
         }
@@ -282,7 +282,7 @@ class RealUrlImage extends ContentObjectRenderer
             $this->new_fileName = basename($this->new_fileName);
         }
         if (strstr($this->new_fileName, '.')) {
-            $this->new_fileName = str_replace(array(
+            $this->new_fileName = str_replace([
                 '.jpg',
                 '.JPG',
                 '.jpeg',
@@ -291,7 +291,7 @@ class RealUrlImage extends ContentObjectRenderer
                 '.PNG',
                 '.gif',
                 '.GIF'
-            ), '', $this->new_fileName);
+            ], '', $this->new_fileName);
         }
         // make this text basis suitable for a file name
         $this->new_fileName = $this->smartEncoding($this->new_fileName);
@@ -537,13 +537,13 @@ class RealUrlImage extends ContentObjectRenderer
             $data['tstamp'] = time();
             $data['page_id'] = implode(',', $pids);
         } else {
-            $data = array(
+            $data = [
                 'crdate' => time(),
                 'tstamp' => time(),
                 'image_path' => $this->org_fileName,
                 'new_path' => $new_fileName,
                 'page_id' => $GLOBALS['TSFE']->id
-            );
+            ];
         }
         $cache->set($cacheIdent, serialize($data));
         return true;

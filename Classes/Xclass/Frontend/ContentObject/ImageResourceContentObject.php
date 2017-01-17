@@ -26,7 +26,7 @@ class ImageResourceContentObject extends \TYPO3\CMS\Frontend\ContentObject\Image
      *
      * @return string
      */
-    public function render($conf = array())
+    public function render($conf = [])
     {
         $this->cObj->setSkipRealUrlImageInGetImgResource(true);
         $GLOBALS['TSFE']->lastImgResourceInfo = $this->cObj->getImgResource($conf['file'], $conf['file.']);

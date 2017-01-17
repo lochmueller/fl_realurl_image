@@ -40,7 +40,7 @@ class UriFrontend extends StringFrontend
      * @throws \TYPO3\CMS\Core\Cache\Exception\InvalidDataException if the variable to cache is not of type string
      * @api
      */
-    public function set($entryIdentifier, $string, array $tags = array(), $lifetime = null)
+    public function set($entryIdentifier, $string, array $tags = [], $lifetime = null)
     {
         if (!$this->isValidEntryIdentifier($entryIdentifier)) {
             throw new \InvalidArgumentException('"' . $entryIdentifier . '" is not a valid cache entry identifier.', 1233057566);

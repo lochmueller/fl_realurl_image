@@ -44,7 +44,7 @@ class Configuration
         }
         $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
         if (!is_array($extensionConfiguration)) {
-            $extensionConfiguration = array();
+            $extensionConfiguration = [];
         }
         return $extensionConfiguration;
     }

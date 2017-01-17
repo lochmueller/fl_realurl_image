@@ -9,8 +9,6 @@
 namespace FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject;
 
 use FRUIT\FlRealurlImage\RealUrlImage;
-use TYPO3\CMS\Core\Imaging\GraphicalFunctions;
-use TYPO3\CMS\Core\Resource\Exception;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -91,7 +89,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             $params = ' ' . $params;
         }
 
-        $imageTagValues = array(
+        $imageTagValues = [
             'width'               => (int)$info[0],
             'height'              => (int)$info[1],
             'src'                 => htmlspecialchars($source),
@@ -100,12 +98,12 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             'border'              => $this->getBorderAttr(' border="' . (int)$conf['border'] . '"'),
             'sourceCollection'    => $sourceCollection,
             'selfClosingTagSlash' => (!empty($tsfe->xhtmlDoctype) ? ' /' : ''),
-        );
+        ];
 
         // ###################################
         // ## Here begins RealUrl_image ######
         // ###################################
-        $tx_flrealurlimage = GeneralUtility::makeInstance('FRUIT\\FlRealurlImage\\RealUrlImage');
+        $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
         $tx_flrealurlimage->start($this->data, $this->table);
         $new_fileName = $tx_flrealurlimage->main($conf, $info, $file, $this);
         $imageTagValues['src'] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);

@@ -14,6 +14,9 @@ use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 class PictureViewHelper extends \FluidTYPO3\Vhs\ViewHelpers\Media\PictureViewHelper
 {
 
+    /**
+     * @return string
+     */
     public function render()
     {
         $properties = [

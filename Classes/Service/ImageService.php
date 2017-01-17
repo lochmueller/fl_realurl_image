@@ -58,8 +58,8 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
         $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
         $tx_flrealurlimage->start(null, null);
         if ($image instanceof ProcessedFile) {
-            $info = array(3 => $imageUrl);
-            $imageUrl = $tx_flrealurlimage->main(array(), $info, $this->imageForRealName);
+            $info = [3 => $imageUrl];
+            $imageUrl = $tx_flrealurlimage->main([], $info, $this->imageForRealName);
         }
         $this->imageForRealName = null;
 

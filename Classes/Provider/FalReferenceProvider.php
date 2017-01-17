@@ -53,7 +53,7 @@ class FalReferenceProvider extends AbstractProvider
                 $this->baseInformation['cObj']
             );
         }
-        return array();
+        return [];
     }
 
     /**

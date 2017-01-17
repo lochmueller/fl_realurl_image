@@ -25,7 +25,7 @@ class FileInformation
      * Get information from the fal record of the current rendering
      *
      * @param array $imageInformation
-     * @param mixed $imageInformation
+     * @param mixed $fileTypeInformation
      *
      * @return array
      */
@@ -37,7 +37,7 @@ class FileInformation
             return $fileTypeInformation->getOriginalFile()
                 ->getProperties();
         }
-        return array();
+        return [];
     }
 
     /**
@@ -57,7 +57,7 @@ class FileInformation
             return $file->getProperties();
         }
         if (!($cObj instanceof ContentObjectRenderer)) {
-            return array();
+            return [];
         }
 
         $fileReference = null;
@@ -80,7 +80,7 @@ class FileInformation
                     }
                 }
             } catch (\Exception $exception) {
-                return array();
+                return [];
             }
         }
 
@@ -88,6 +88,6 @@ class FileInformation
             return $fileReference->getProperties();
         }
 
-        return array();
+        return [];
     }
 }

@@ -1,16 +1,16 @@
 <?php
 
 
-$tempColumns = array(
-    'realurl_image_name' => array(
+$tempColumns = [
+    'realurl_image_name' => [
         'exclude' => 1,
         'label'   => 'LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:sys_file_metadata.realurl_image_name',
-        'config'  => array(
+        'config'  => [
             'type' => 'input',
             'eval' => 'trim',
-        )
-    ),
-);
+        ]
+    ],
+];
 
 
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file_metadata', $tempColumns);
