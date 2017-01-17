@@ -27,7 +27,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
 
     /**
      * @param \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $image
-     * @param array                                                                $processingInstructions
+     * @param array $processingInstructions
      *
      * @return ProcessedFile
      */
@@ -47,7 +47,11 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      */
     public function getImageUri(FileInterface $image, $absolute = false)
     {
-        $imageUrl = $image->getPublicUrl();
+        if (!$image->getStorage()->isPublic() && $this->environmentService->isEnvironmentInFrontendMode()) {
+            $imageUrl = $image->getForLocalProcessing(false);
+        } else {
+            $imageUrl = $image->getPublicUrl();
+        }
 
         // call fl_realurl_image to generate $new_fileName
         /** @var RealUrlImage $tx_flrealurlimage */
