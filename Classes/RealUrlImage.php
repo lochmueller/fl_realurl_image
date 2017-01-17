@@ -17,7 +17,9 @@ use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\TypoScriptProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
+use HDNET\RealurlReplacement\Service\ReplacementService;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
@@ -177,7 +179,7 @@ class RealUrlImage extends ContentObjectRenderer
      * @param array $info image info array:
      * @param mixed $file
      *
-     * @param null  $cObj
+     * @param null $cObj
      *
      * @return string
      */
@@ -197,7 +199,7 @@ class RealUrlImage extends ContentObjectRenderer
     /**
      * initializing tx_flrealurlimage class
      *
-     * @param array $conf  IMAGE-Object configuration array
+     * @param array $conf IMAGE-Object configuration array
      * @param array $image image info array:
      * @param mixed $file
      *
@@ -318,10 +320,10 @@ class RealUrlImage extends ContentObjectRenderer
         $configurations = $this->getConfigurationValues();
 
         $baseInformation = [
-            'image'               => $this->image,
+            'image' => $this->image,
             'fileTypeInformation' => $this->fileTypeInformation,
-            'IMAGE_conf'          => $this->IMAGE_conf,
-            'cObj'                => $this->getCObj(),
+            'IMAGE_conf' => $this->IMAGE_conf,
+            'cObj' => $this->getCObj(),
         ];
 
         $providers = [
@@ -412,14 +414,21 @@ class RealUrlImage extends ContentObjectRenderer
         }
         // spaceCharacter
         $textBase = strtr($textBase, ' -+_', $space . $space . $space);
-        // smartEncoding
-        if ($this->fl_conf['smartEncoding']) {
-            $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
-            $textBase = $GLOBALS['TSFE']->csConvObj->specCharsToASCII(
-                $charset,
-                $textBase
-            ); // Convert extended letters to ascii equivalents
-            $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
+        // use realurl replacement Service on textBase if installed
+        if (ExtensionManagementUtility::isLoaded('realurl_replacement')) {
+            /** @var ReplacementService $realurlReplacementService */
+            $realurlReplacementService = GeneralUtility::makeInstance(ReplacementService::class);
+            $textBase = $realurlReplacementService->replaceString($textBase);
+        } else {
+            // smartEncoding
+            if ($this->fl_conf['smartEncoding']) {
+                $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
+                $textBase = $GLOBALS['TSFE']->csConvObj->specCharsToASCII(
+                    $charset,
+                    $textBase
+                ); // Convert extended letters to ascii equivalents
+                $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
+            }
         }
         // spaceCharacter
         $textBase = preg_replace('/[\/\\' . $space . ']+' . '/i', $space, $textBase); // Convert multiple $space to a single one
@@ -529,11 +538,11 @@ class RealUrlImage extends ContentObjectRenderer
             $data['page_id'] = implode(',', $pids);
         } else {
             $data = array(
-                'crdate'     => time(),
-                'tstamp'     => time(),
+                'crdate' => time(),
+                'tstamp' => time(),
                 'image_path' => $this->org_fileName,
-                'new_path'   => $new_fileName,
-                'page_id'    => $GLOBALS['TSFE']->id
+                'new_path' => $new_fileName,
+                'page_id' => $GLOBALS['TSFE']->id
             );
         }
         $cache->set($cacheIdent, serialize($data));
@@ -566,7 +575,7 @@ class RealUrlImage extends ContentObjectRenderer
      * creates a hard-link / sym-link / copy of the oritinal image to the new location
      *
      * @param string $relativeOriginalPath the path to the original image e.g.: typo3temp/pics/2305e38d9c.jpg
-     * @param string $relativeNewPath      the path to the new image
+     * @param string $relativeNewPath the path to the new image
      *
      * @throws \Exception
      */
