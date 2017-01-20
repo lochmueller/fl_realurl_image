@@ -47,7 +47,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      */
     public function getImageUri(FileInterface $image, $absolute = false)
     {
-        if (!$image->getStorage()->isPublic() && $this->environmentService->isEnvironmentInFrontendMode()) {
+        if ($image->getStorage()->getDriverType() === 'Local' && !$image->getStorage()->isPublic() && $this->environmentService->isEnvironmentInFrontendMode()) {
             $imageUrl = $image->getForLocalProcessing(false);
         } else {
             $imageUrl = $image->getPublicUrl();
