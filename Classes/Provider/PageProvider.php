@@ -56,6 +56,12 @@ class PageProvider extends AbstractProvider
         }
 
         self::$pageInformation = BackendUtility::getRecord('pages', $GLOBALS['TSFE']->id);
+        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
+            $overlay = BackendUtility::getRecordLocalization('pages', $GLOBALS['TSFE']->id, $GLOBALS['TSFE']->sys_language_uid);
+            if (!empty($overlay)) {
+                self::$pageInformation = $overlay[0];
+            }
+        }
         return self::$pageInformation;
     }
 }
