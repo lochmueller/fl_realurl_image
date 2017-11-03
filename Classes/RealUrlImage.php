@@ -613,6 +613,10 @@ class RealUrlImage extends ContentObjectRenderer
                 throw new \Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
             }
         }
+        $indexFile = rtrim($new_folder, '/') . '/index.html';
+        if (!is_file($indexFile)) {
+            touch($indexFile);
+        }
         if (TYPO3_OS == 'WIN') {
             if ($this->configuration->get('fileLinks') == 'copy') {
                 copy($relativeOriginalPath, $absoluteNewPath);
