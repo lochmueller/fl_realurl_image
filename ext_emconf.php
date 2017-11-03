@@ -11,8 +11,8 @@ $EM_CONF[$_EXTKEY] = [
     'author_company' => 'typo3.fruit-lab.de',
     'constraints'    => [
         'depends' => [
-            'typo3' => '7.6.0-8.99.99',
-            'php'   => '5.6.0-0.0.0',
+            'typo3' => '8.7.0-8.7.99',
+            'php'   => '7.0.0-0.0.0',
         ],
     ],
 ];
