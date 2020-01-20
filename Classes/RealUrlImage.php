@@ -24,7 +24,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
@@ -116,7 +116,7 @@ class RealUrlImage extends ContentObjectRenderer
         $cache = $this->getCache();
         if ($cache->has($cacheIdentifier)) {
             // get the information to the requested image
-            $data = unserialize($cache->get($cacheIdentifier));
+            $data = unserialize($cache->get($cacheIdentifier), FALSE);
             // update DB to idicate that image was requested
             if (!strstr($data['page_id'], '?')) {
                 $page_id = trim($data['page_id'] . ',?', ',');
@@ -187,7 +187,7 @@ class RealUrlImage extends ContentObjectRenderer
     {
         $this->init($conf, $info, $file, $cObj);
 
-        if ($this->enable && trim($this->org_fileName) != '') {
+        if ($this->enable && trim($this->org_fileName) !== '') {
             $new = $this->generateFileName();
             if ($new !== '') {
                 return $new;
@@ -213,15 +213,15 @@ class RealUrlImage extends ContentObjectRenderer
 
         // fl_conf
         $global_conf = [];
-        if (is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'])) {
+        if (\is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'])) {
             $global_conf = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'];
         }
         $local_conf = [];
-        if (is_array($conf['fl_realurl_image.'])) {
+        if (\is_array($conf['fl_realurl_image.'])) {
             $local_conf = $conf['fl_realurl_image.'];
         }
 
-        $global_conf = ArrayUtility::arrayMergeRecursiveOverrule($global_conf, $local_conf);
+        ArrayUtility::mergeRecursiveWithOverrule($global_conf, $local_conf);
 
         $this->fl_conf = $global_conf;
 
@@ -237,7 +237,7 @@ class RealUrlImage extends ContentObjectRenderer
         } else {
             $this->new_fileName = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image'];
         }
-        if ($this->new_fileName == '1') {
+        if ($this->new_fileName === '1') {
             $this->new_fileName = '';
         }
 
@@ -247,8 +247,10 @@ class RealUrlImage extends ContentObjectRenderer
         }
 
         // enable
-        if (strtolower($this->new_fileName) == 'off' || $this->new_fileName === 0 || // fl_realurl_image switched off on this page
-            !is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.']) // no static template
+        if ($this->new_fileName === 0
+			|| !\is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.']) // no static template
+			|| strtolower($this->new_fileName) === 'off'  // fl_realurl_image switched off on this page
+
         ) {
             $this->enable = false;
         }

@@ -34,7 +34,7 @@ class ImageResourceContentObject extends \TYPO3\CMS\Frontend\ContentObject\Image
         // ###################################
         // ## Here begins RealUrl_image ######
         // ###################################
-        if (is_array($GLOBALS['TSFE']->lastImgResourceInfo)) {
+        if (\is_array($GLOBALS['TSFE']->lastImgResourceInfo)) {
             /** @var RealUrlImage $tx_flrealurlimage */
             $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
             $tx_flrealurlimage->start(null, null);

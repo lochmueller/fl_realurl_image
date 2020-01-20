@@ -10,6 +10,7 @@ namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers;
 use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
 use FRUIT\FlRealurlImage\Service\ImageService;
 use TYPO3\CMS\Core\Resource\FileInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * MediaViewHelper
@@ -28,7 +29,7 @@ class MediaViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\MediaViewHelper
      */
     protected function renderImage(FileInterface $image, $width, $height)
     {
-        $alt = isset($this->arguments['alt']) ? $this->arguments['alt'] : '';
+        $alt = $this->arguments['alt'] ?? '';
         ViewHelperProvider::setViewHelperInformation(['alt' => $alt]);
         try {
             $return = parent::renderImage(
@@ -50,8 +51,10 @@ class MediaViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\MediaViewHelper
      *
      * @return ImageService
      */
-    protected function getImageService()
+    protected function getImageService():ImageService
     {
-        return $this->objectManager->get(ImageService::class);
+    	/** @var ImageService $imageService */
+		$imageService = GeneralUtility::makeInstance(ImageService::class);
+		return $imageService;
     }
 }

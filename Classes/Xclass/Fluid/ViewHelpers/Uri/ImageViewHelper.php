@@ -7,13 +7,11 @@
 
 namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers\Uri;
 
+use TYPO3\CMS\Core\Imaging\ImageManipulation\CropVariantCollection;
 use FRUIT\FlRealurlImage\Service\ImageService;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
-use TYPO3\CMS\Core\Resource\FileInterface;
-use TYPO3\CMS\Core\Resource\FileReference;
-use TYPO3\CMS\Extbase\Domain\Model\AbstractFileFolder;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\Exception;
 
@@ -44,39 +42,46 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         $crop = $arguments['crop'];
         //$absolute = $arguments['absolute'];
 
-        if (is_null($src) && is_null($image) || !is_null($src) && !is_null($image)) {
-            throw new Exception('You must either specify a string src or a File object.', 1382284105);
-        }
+        if (($src === null && $image === null) || ($src !== null && $image !== null)) {
+			throw new Exception('You must either specify a string src or a File object.', 1460976233);
+		}
 
-        try {
-            $imageService = self::getImageService();
-            $image = $imageService->getImage($src, $image, $treatIdAsReference);
+		try {
+			$imageService = self::getImageService();
+			$image = $imageService->getImage($src, $image, $treatIdAsReference);
 
-            if ($crop === null) {
-                $crop = $image instanceof FileReference ? $image->getProperty('crop') : null;
-            }
+			if ($cropString === null && $image->hasProperty('crop') && $image->getProperty('crop')) {
+				$cropString = $image->getProperty('crop');
+			}
 
-            $processingInstructions = [
-                'width'     => $arguments['width'],
-                'height'    => $arguments['height'],
-                'minWidth'  => $arguments['minWidth'],
-                'minHeight' => $arguments['minHeight'],
-                'maxWidth'  => $arguments['maxWidth'],
-                'maxHeight' => $arguments['maxHeight'],
-                'crop'      => $crop,
-            ];
-            $processedImage = $imageService->applyProcessingInstructions($image, $processingInstructions);
-            return $imageService->getImageUri($processedImage);
-        } catch (ResourceDoesNotExistException $e) {
-            // thrown if file does not exist
-        } catch (\UnexpectedValueException $e) {
-            // thrown if a file has been replaced with a folder
-        } catch (\RuntimeException $e) {
-            // RuntimeException thrown if a file is outside of a storage
-        } catch (\InvalidArgumentException $e) {
-            // thrown if file storage does not exist
-        }
-        return '';
+			$cropVariantCollection = CropVariantCollection::create((string)$cropString);
+			$cropVariant = $arguments['cropVariant'] ?: 'default';
+			$cropArea = $cropVariantCollection->getCropArea($cropVariant);
+			$processingInstructions = [
+				'width' => $arguments['width'],
+				'height' => $arguments['height'],
+				'minWidth' => $arguments['minWidth'],
+				'minHeight' => $arguments['minHeight'],
+				'maxWidth' => $arguments['maxWidth'],
+				'maxHeight' => $arguments['maxHeight'],
+				'crop' => $cropArea->isEmpty() ? null : $cropArea->makeAbsoluteBasedOnFile($image),
+			];
+
+			$processedImage = $imageService->applyProcessingInstructions($image, $processingInstructions);
+			return $imageService->getImageUri($processedImage, $absolute);
+		} catch (ResourceDoesNotExistException $e) {
+			// thrown if file does not exist
+			throw new Exception($e->getMessage(), 1509741907, $e);
+		} catch (\UnexpectedValueException $e) {
+			// thrown if a file has been replaced with a folder
+			throw new Exception($e->getMessage(), 1509741908, $e);
+		} catch (\RuntimeException $e) {
+			// RuntimeException thrown if a file is outside of a storage
+			throw new Exception($e->getMessage(), 1509741909, $e);
+		} catch (\InvalidArgumentException $e) {
+			// thrown if file storage does not exist
+			throw new Exception($e->getMessage(), 1509741910, $e);
+		}
     }
 
     /**
@@ -86,8 +91,8 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
      */
     protected static function getImageService()
     {
-        /** @var ObjectManager $objectManager */
-        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-        return $objectManager->get(ImageService::class);
+		/** @var ObjectManager $objectManager */
+		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+		return $objectManager->get(ImageService::class);
     }
 }

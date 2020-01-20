@@ -7,12 +7,12 @@
 
 namespace FRUIT\FlRealurlImage\Cache;
 
-use TYPO3\CMS\Core\Cache\Frontend\StringFrontend;
+use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 
 /**
  * @author Tim Lochmüller
  */
-class UriFrontend extends StringFrontend
+class UriFrontend extends VariableFrontend
 {
 
     /**
