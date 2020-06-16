@@ -91,7 +91,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     public function __construct()
     {
-        $objectManager = new ObjectManager();
+        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $this->configuration = $objectManager->get(Configuration::class);
     }
 
@@ -406,7 +406,6 @@ class RealUrlImage extends ContentObjectRenderer
     {
         // decode $textBase
         $textBase = urldecode($textBase);
-
         // stdWrap
         $textBase = $this->stdWrap($textBase, $this->fl_conf);
         // Convert some special tokens to the space character:
@@ -425,10 +424,12 @@ class RealUrlImage extends ContentObjectRenderer
             // smartEncoding
             if ($this->fl_conf['smartEncoding']) {
                 $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
-                $textBase = $GLOBALS['TSFE']->csConvObj->specCharsToASCII(
-                    $charset,
-                    $textBase
-                ); // Convert extended letters to ascii equivalents
+                
+                if (is_null($charset)) {
+                    $charset = 'utf-8';
+                }
+                $textBase = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Charset\CharsetConverter::class)->specCharsToASCII($charset, $textBase);
+                // Convert extended letters to ascii equivalents
                 $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
             }
         }
@@ -665,7 +666,7 @@ class RealUrlImage extends ContentObjectRenderer
             return $cache;
         }
         /** @var CacheManager $cacheManager */
-        $objectManager = new ObjectManager();
+        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $cacheManager = $objectManager->get(CacheManager::class);
         $cache = $cacheManager->getCache('fl_realurl_image');
         return $cache;

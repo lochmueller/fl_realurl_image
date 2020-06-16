@@ -31,7 +31,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      *
      * @return ProcessedFile
      */
-    public function applyProcessingInstructions($image, $processingInstructions)
+    public function applyProcessingInstructions($image, array $processingInstructions): ProcessedFile
     {
         $this->imageForRealName = $image;
         return parent::applyProcessingInstructions($image, $processingInstructions);
@@ -45,7 +45,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      * @return string
      * @api
      */
-    public function getImageUri(FileInterface $image, $absolute = false)
+    public function getImageUri(FileInterface $image, $absolute = false): string
     {
         if ($image->getStorage()->getDriverType() === 'Local' && !$image->getStorage()->isPublic() && $this->environmentService->isEnvironmentInFrontendMode()) {
             $imageUrl = $image->getForLocalProcessing(false);
