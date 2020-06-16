@@ -1,5 +1,5 @@
 {
-  "name": "lochmueller/fl_realurl_image",
+  "name": "web-vision/fl_realurl_image",
   "type": "typo3-cms-extension",
   "version": "5.0.0",
   "description": "Add the RealURL functionality to image files. 'typo3temp/2d972d5c89b5.jpg' goes 'nice-name.jpg'! Many different fallbacks like file reference, file, content element or page settings to get the right file name.",
@@ -28,7 +28,7 @@
   ],
   "require": {
     "php": ">=7.0.0",
-    "typo3/cms-core": "~8.7.0||dev-master"
+    "typo3/cms-core": "^9.5 || ^10.4"
   },
   "replace": {
     "fl_realurl_image": "self.version",
