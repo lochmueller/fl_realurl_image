@@ -23,11 +23,11 @@ class MediaViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\MediaViewHelper
      * @param FileInterface $image
      * @param string $width
      * @param string $height
-     *
+     * @param string|null $fileExtension
      * @return string Rendered img tag
      * @throws \Exception
      */
-    protected function renderImage(FileInterface $image, $width, $height)
+    protected function renderImage(FileInterface $image, $width, $height, ?string $fileExtension)
     {
         $alt = $this->arguments['alt'] ?? '';
         ViewHelperProvider::setViewHelperInformation(['alt' => $alt]);
@@ -35,7 +35,8 @@ class MediaViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\MediaViewHelper
             $return = parent::renderImage(
                 $image,
                 $width,
-                $height
+                $height,
+                $fileExtension
             );
         } catch (\Exception $ex) {
             ViewHelperProvider::resetViewHelperInformation();
