@@ -144,13 +144,13 @@ class RealUrlImage extends ContentObjectRenderer
             } // send headers for image and output the image
             // this is the "manual" way to display an image
             else {
-                $info = getimagesize(PATH_site . $data['image_path']);
+                $info = getimagesize(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']);
                 header('Content-Type: ' . $info['mime']);
-                header('Content-Length: ' . filesize(PATH_site . $data['image_path']));
+                header('Content-Length: ' . filesize(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']));
                 if ($this->configuration->get('cacheControl') && $data['tstamp'] != 0) {
                     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data['tstamp']) . ' GMT');
                 }
-                readfile(PATH_site . $data['image_path']);
+                readfile(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']);
                 die();
             }
         }
@@ -562,9 +562,9 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function deleteFileCache($org_path, $new_path)
     {
-        if (TYPO3_OS !== 'WIN') {
-            $new_path = PATH_site . $new_path;
-            $org_path = PATH_site . $org_path;
+        if (!\TYPO3\CMS\Core\Core\Environment::isWindows()) {
+            $new_path = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $new_path;
+            $org_path = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $org_path;
         }
 
         if (is_file($new_path) && is_file($org_path)) {
@@ -620,7 +620,7 @@ class RealUrlImage extends ContentObjectRenderer
         if (!is_file($indexFile)) {
             touch($indexFile);
         }
-        if (TYPO3_OS == 'WIN') {
+        if (\TYPO3\CMS\Core\Core\Environment::isWindows()) {
             if ($this->configuration->get('fileLinks') == 'copy') {
                 copy($relativeOriginalPath, $absoluteNewPath);
             } else {
