@@ -42,9 +42,14 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         $crop = $arguments['crop'];
         //$absolute = $arguments['absolute'];
 
-        if (($src === null && $image === null) || ($src !== null && $image !== null)) {
-			throw new Exception('You must either specify a string src or a File object.', 1460976233);
-		}
+        if (($src === '' && $image === null) || ($src !== '' && $image !== null)) {
+            throw new Exception('You must either specify a string src or a File object.', 1460976233);
+        }
+
+        // A URL was given as src, this is kept as is
+        if ($src !== '' && preg_match('/^(https?:)?\/\//', $src)) {
+            return $src;
+        }
 
 		try {
 			$imageService = self::getImageService();
