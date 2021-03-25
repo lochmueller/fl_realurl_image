@@ -31,7 +31,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      *
      * @return ProcessedFile
      */
-    public function applyProcessingInstructions($image, array $processingInstructions): ProcessedFile
+    public function applyProcessingInstructions($image, $processingInstructions): ProcessedFile
     {
         $this->imageForRealName = $image;
         return parent::applyProcessingInstructions($image, $processingInstructions);
