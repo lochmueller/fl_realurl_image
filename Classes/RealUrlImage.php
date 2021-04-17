@@ -23,7 +23,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
@@ -424,7 +423,7 @@ class RealUrlImage extends ContentObjectRenderer
             // smartEncoding
             if ($this->fl_conf['smartEncoding']) {
                 $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
-                
+
                 if (is_null($charset)) {
                     $charset = 'utf-8';
                 }
@@ -490,7 +489,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function writeDBcollisionHandling($textBase)
     {
-        list($trunk, $ending) = explode('.', $textBase);
+        [$trunk, $ending] = explode('.', $textBase);
         $count = '';
         $cache = $this->getCache();
         while (1) {
@@ -584,7 +583,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function createFileCache($relativeOriginalPath, $relativeNewPath)
     {
-        $absoluteOriginalPath = GeneralUtility::getFileAbsFileName($relativeOriginalPath);
+        $absoluteOriginalPath = $_SERVER['DOCUMENT_ROOT'] . $relativeOriginalPath;
 
         if (!is_file($absoluteOriginalPath)) {
             $relativeOriginalPath = rawurldecode($relativeOriginalPath);

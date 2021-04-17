@@ -7,6 +7,9 @@
 
 namespace FRUIT\FlRealurlImage;
 
+use TYPO3\CMS\Core\Configuration\ExtensionConfiguration;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+
 /**
  * Configuration handling
  *
@@ -42,7 +45,8 @@ class Configuration
         if ($extensionConfiguration !== null) {
             return $extensionConfiguration;
         }
-        $extensionConfiguration = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['fl_realurl_image']);
+        $extensionConfiguration = GeneralUtility::makeInstance(ExtensionConfiguration::class)->get('fl_realurl_image');
+
         if (!is_array($extensionConfiguration)) {
             $extensionConfiguration = [];
         }
