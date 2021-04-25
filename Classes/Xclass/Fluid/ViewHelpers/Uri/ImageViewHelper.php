@@ -39,10 +39,10 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         $src = $arguments['src'];
         $image = $arguments['image'];
         $treatIdAsReference = $arguments['treatIdAsReference'];
-        $crop = $arguments['crop'];
+        $cropString = $arguments['crop'];
         //$absolute = $arguments['absolute'];
 
-        if (($src === '' && $image === null) || ($src !== '' && $image !== null)) {
+        if (($src === null && $image === null) || ($src !== null && $image !== null)) {
             throw new Exception('You must either specify a string src or a File object.', 1460976233);
         }
 
