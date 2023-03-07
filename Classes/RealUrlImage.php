@@ -23,8 +23,7 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
-use TYPO3\CMS\Extbase\Utility\ArrayUtility;
+use TYPO3\CMS\Core\Utility\ArrayUtility;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
@@ -91,7 +90,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     public function __construct()
     {
-        $objectManager = new ObjectManager();
+        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $this->configuration = $objectManager->get(Configuration::class);
     }
 
@@ -116,7 +115,7 @@ class RealUrlImage extends ContentObjectRenderer
         $cache = $this->getCache();
         if ($cache->has($cacheIdentifier)) {
             // get the information to the requested image
-            $data = unserialize($cache->get($cacheIdentifier));
+            $data = unserialize($cache->get($cacheIdentifier), FALSE);
             // update DB to idicate that image was requested
             if (!strstr($data['page_id'], '?')) {
                 $page_id = trim($data['page_id'] . ',?', ',');
@@ -144,13 +143,13 @@ class RealUrlImage extends ContentObjectRenderer
             } // send headers for image and output the image
             // this is the "manual" way to display an image
             else {
-                $info = getimagesize(PATH_site . $data['image_path']);
+                $info = getimagesize(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']);
                 header('Content-Type: ' . $info['mime']);
-                header('Content-Length: ' . filesize(PATH_site . $data['image_path']));
+                header('Content-Length: ' . filesize(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']));
                 if ($this->configuration->get('cacheControl') && $data['tstamp'] != 0) {
                     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data['tstamp']) . ' GMT');
                 }
-                readfile(PATH_site . $data['image_path']);
+                readfile(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']);
                 die();
             }
         }
@@ -187,7 +186,7 @@ class RealUrlImage extends ContentObjectRenderer
     {
         $this->init($conf, $info, $file, $cObj);
 
-        if ($this->enable && trim($this->org_fileName) != '') {
+        if ($this->enable && trim($this->org_fileName) !== '') {
             $new = $this->generateFileName();
             if ($new !== '') {
                 return $new;
@@ -213,15 +212,15 @@ class RealUrlImage extends ContentObjectRenderer
 
         // fl_conf
         $global_conf = [];
-        if (is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'])) {
+        if (\is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'])) {
             $global_conf = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'];
         }
         $local_conf = [];
-        if (is_array($conf['fl_realurl_image.'])) {
+        if (\is_array($conf['fl_realurl_image.'])) {
             $local_conf = $conf['fl_realurl_image.'];
         }
 
-        $global_conf = ArrayUtility::arrayMergeRecursiveOverrule($global_conf, $local_conf);
+        ArrayUtility::mergeRecursiveWithOverrule($global_conf, $local_conf);
 
         $this->fl_conf = $global_conf;
 
@@ -237,7 +236,7 @@ class RealUrlImage extends ContentObjectRenderer
         } else {
             $this->new_fileName = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image'];
         }
-        if ($this->new_fileName == '1') {
+        if ($this->new_fileName === '1') {
             $this->new_fileName = '';
         }
 
@@ -247,8 +246,10 @@ class RealUrlImage extends ContentObjectRenderer
         }
 
         // enable
-        if (strtolower($this->new_fileName) == 'off' || $this->new_fileName === 0 || // fl_realurl_image switched off on this page
-            !is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.']) // no static template
+        if ($this->new_fileName === 0
+			|| !\is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.']) // no static template
+			|| strtolower($this->new_fileName) === 'off'  // fl_realurl_image switched off on this page
+
         ) {
             $this->enable = false;
         }
@@ -404,7 +405,6 @@ class RealUrlImage extends ContentObjectRenderer
     {
         // decode $textBase
         $textBase = urldecode($textBase);
-
         // stdWrap
         $textBase = $this->stdWrap($textBase, $this->fl_conf);
         // Convert some special tokens to the space character:
@@ -423,10 +423,12 @@ class RealUrlImage extends ContentObjectRenderer
             // smartEncoding
             if ($this->fl_conf['smartEncoding']) {
                 $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
-                $textBase = $GLOBALS['TSFE']->csConvObj->specCharsToASCII(
-                    $charset,
-                    $textBase
-                ); // Convert extended letters to ascii equivalents
+
+                if (is_null($charset)) {
+                    $charset = 'utf-8';
+                }
+                $textBase = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Charset\CharsetConverter::class)->specCharsToASCII($charset, $textBase);
+                // Convert extended letters to ascii equivalents
                 $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
             }
         }
@@ -487,7 +489,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function writeDBcollisionHandling($textBase)
     {
-        list($trunk, $ending) = explode('.', $textBase);
+        [$trunk, $ending] = explode('.', $textBase);
         $count = '';
         $cache = $this->getCache();
         while (1) {
@@ -559,9 +561,9 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function deleteFileCache($org_path, $new_path)
     {
-        if (TYPO3_OS !== 'WIN') {
-            $new_path = PATH_site . $new_path;
-            $org_path = PATH_site . $org_path;
+        if (!\TYPO3\CMS\Core\Core\Environment::isWindows()) {
+            $new_path = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $new_path;
+            $org_path = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $org_path;
         }
 
         if (is_file($new_path) && is_file($org_path)) {
@@ -581,7 +583,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function createFileCache($relativeOriginalPath, $relativeNewPath)
     {
-        $absoluteOriginalPath = GeneralUtility::getFileAbsFileName($relativeOriginalPath);
+        $absoluteOriginalPath = $_SERVER['DOCUMENT_ROOT'] . $relativeOriginalPath;
 
         if (!is_file($absoluteOriginalPath)) {
             $relativeOriginalPath = rawurldecode($relativeOriginalPath);
@@ -617,7 +619,7 @@ class RealUrlImage extends ContentObjectRenderer
         if (!is_file($indexFile)) {
             touch($indexFile);
         }
-        if (TYPO3_OS == 'WIN') {
+        if (\TYPO3\CMS\Core\Core\Environment::isWindows()) {
             if ($this->configuration->get('fileLinks') == 'copy') {
                 copy($relativeOriginalPath, $absoluteNewPath);
             } else {
@@ -663,7 +665,7 @@ class RealUrlImage extends ContentObjectRenderer
             return $cache;
         }
         /** @var CacheManager $cacheManager */
-        $objectManager = new ObjectManager();
+        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
         $cacheManager = $objectManager->get(CacheManager::class);
         $cache = $cacheManager->getCache('fl_realurl_image');
         return $cache;

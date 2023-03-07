@@ -68,7 +68,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         $this->setSkipRealUrlImageInGetImgResource(true);
         $info = $this->getImgResource($file, $conf['file.']);
         $tsfe->lastImageInfo = $info;
-        if (!is_array($info)) {
+        if (!\is_array($info)) {
             return '';
         }
         if (is_file(PATH_site . $info['3'])) {
@@ -97,7 +97,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             'altParams'           => $altParam,
             'border'              => $this->getBorderAttr(' border="' . (int)$conf['border'] . '"'),
             'sourceCollection'    => $sourceCollection,
-            'selfClosingTagSlash' => (!empty($tsfe->xhtmlDoctype) ? ' /' : ''),
+            'selfClosingTagSlash' => !empty($tsfe->xhtmlDoctype) ? ' /' : '',
         ];
 
         // ###################################
@@ -156,7 +156,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
     public function getImgResource($file, $fileArray)
     {
         $result = parent::getImgResource($file, $fileArray);
-        if (!is_array($result)) {
+        if (!\is_array($result)) {
             return $result;
         }
 

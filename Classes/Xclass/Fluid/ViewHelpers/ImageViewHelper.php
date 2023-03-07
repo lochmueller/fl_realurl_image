@@ -9,6 +9,7 @@ namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers;
 
 use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
 use FRUIT\FlRealurlImage\Service\ImageService;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Overwrite Image ViewHelper
@@ -28,7 +29,7 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper
      */
     public function render()
     {
-        $this->imageService = $this->objectManager->get(ImageService::class);
+        $this->imageService = GeneralUtility::makeInstance(ImageService::class);
         ViewHelperProvider::setViewHelperInformation(['alt' => $this->arguments['alt']]);
         try {
             $return = parent::render();
