@@ -8,6 +8,10 @@
 
 namespace FRUIT\FlRealurlImage;
 
+use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Charset\CharsetConverter;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use FRUIT\FlRealurlImage\Provider\AbstractProvider;
 use FRUIT\FlRealurlImage\Provider\FalMetaProvider;
 use FRUIT\FlRealurlImage\Provider\FalProvider;
@@ -143,13 +147,13 @@ class RealUrlImage extends ContentObjectRenderer
             } // send headers for image and output the image
             // this is the "manual" way to display an image
             else {
-                $info = getimagesize(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']);
+                $info = getimagesize(Environment::getPublicPath() . '/' . $data['image_path']);
                 header('Content-Type: ' . $info['mime']);
-                header('Content-Length: ' . filesize(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']));
+                header('Content-Length: ' . filesize(Environment::getPublicPath() . '/' . $data['image_path']));
                 if ($this->configuration->get('cacheControl') && $data['tstamp'] != 0) {
                     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data['tstamp']) . ' GMT');
                 }
-                readfile(\TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $data['image_path']);
+                readfile(Environment::getPublicPath() . '/' . $data['image_path']);
                 die();
             }
         }
@@ -264,8 +268,6 @@ class RealUrlImage extends ContentObjectRenderer
      * - writes in DB
      * - create static file caches
      *
-     * @param       nothing
-     *
      * @return        string       the new file name
      */
     protected function generateFileName()
@@ -310,8 +312,6 @@ class RealUrlImage extends ContentObjectRenderer
 
     /**
      * generates a text Base for generation of a speaking file name
-     *
-     * @param       nothing
      *
      * @return        string       Text name base
      */
@@ -415,6 +415,7 @@ class RealUrlImage extends ContentObjectRenderer
         // spaceCharacter
         $textBase = strtr($textBase, ' -+_', $space . $space . $space);
         // use realurl replacement Service on textBase if installed
+        // todo: add hook instead hardcoded
         if (ExtensionManagementUtility::isLoaded('realurl_replacement')) {
             /** @var ReplacementService $realurlReplacementService */
             $realurlReplacementService = GeneralUtility::makeInstance(ReplacementService::class);
@@ -427,7 +428,7 @@ class RealUrlImage extends ContentObjectRenderer
                 if (is_null($charset)) {
                     $charset = 'utf-8';
                 }
-                $textBase = GeneralUtility::makeInstance(\TYPO3\CMS\Core\Charset\CharsetConverter::class)->specCharsToASCII($charset, $textBase);
+                $textBase = GeneralUtility::makeInstance(CharsetConverter::class)->specCharsToASCII($charset, $textBase);
                 // Convert extended letters to ascii equivalents
                 $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
             }
@@ -515,7 +516,6 @@ class RealUrlImage extends ContentObjectRenderer
                 }
             }
         }
-        return null;
     }
 
     /**
@@ -561,9 +561,9 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function deleteFileCache($org_path, $new_path)
     {
-        if (!\TYPO3\CMS\Core\Core\Environment::isWindows()) {
-            $new_path = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $new_path;
-            $org_path = \TYPO3\CMS\Core\Core\Environment::getPublicPath() . '/' . $org_path;
+        if (!Environment::isWindows()) {
+            $new_path = Environment::getPublicPath() . '/' . $new_path;
+            $org_path = Environment::getPublicPath() . '/' . $org_path;
         }
 
         if (is_file($new_path) && is_file($org_path)) {
@@ -619,7 +619,7 @@ class RealUrlImage extends ContentObjectRenderer
         if (!is_file($indexFile)) {
             touch($indexFile);
         }
-        if (\TYPO3\CMS\Core\Core\Environment::isWindows()) {
+        if (Environment::isWindows()) {
             if ($this->configuration->get('fileLinks') == 'copy') {
                 copy($relativeOriginalPath, $absoluteNewPath);
             } else {
@@ -655,8 +655,8 @@ class RealUrlImage extends ContentObjectRenderer
     /**
      * Get the static file cache
      *
-     * @return \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
-     * @throws \TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException
+     * @return FrontendInterface
+     * @throws NoSuchCacheException
      */
     protected function getCache()
     {

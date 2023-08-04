@@ -1,6 +1,7 @@
 <?php
 
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 $tempColumns = [
     'realurl_image_name' => [
         'exclude' => 1,
@@ -13,8 +14,8 @@ $tempColumns = [
 ];
 
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file_metadata', $tempColumns);
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes(
+ExtensionManagementUtility::addTCAcolumns('sys_file_metadata', $tempColumns);
+ExtensionManagementUtility::addToAllTCAtypes(
     'sys_file_metadata',
     'realurl_image_name',
     '',

@@ -7,6 +7,8 @@
 
 namespace FRUIT\FlRealurlImage\Provider;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 
 /**
@@ -56,8 +58,8 @@ class PageProvider extends AbstractProvider
         }
 
         self::$pageInformation = BackendUtility::getRecord('pages', $GLOBALS['TSFE']->id);
-        if ($GLOBALS['TSFE']->sys_language_uid > 0) {
-            $overlay = BackendUtility::getRecordLocalization('pages', $GLOBALS['TSFE']->id, $GLOBALS['TSFE']->sys_language_uid);
+        if (($sys_language_uid = GeneralUtility::makeInstance(Context::class)->getPropertyFromAspect('language', 'id')) > 0) {
+            $overlay = BackendUtility::getRecordLocalization('pages', $GLOBALS['TSFE']->id, $sys_language_uid);
             if (!empty($overlay)) {
                 self::$pageInformation = $overlay[0];
             }

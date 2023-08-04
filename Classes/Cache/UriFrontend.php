@@ -7,6 +7,7 @@
 
 namespace FRUIT\FlRealurlImage\Cache;
 
+use TYPO3\CMS\Core\Cache\Exception\InvalidDataException;
 use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
 
 /**
@@ -37,7 +38,7 @@ class UriFrontend extends VariableFrontend
      *
      * @return void
      * @throws \InvalidArgumentException if the identifier or tag is not valid
-     * @throws \TYPO3\CMS\Core\Cache\Exception\InvalidDataException if the variable to cache is not of type string
+     * @throws InvalidDataException if the variable to cache is not of type string
      * @api
      */
     public function set($entryIdentifier, $string, array $tags = [], $lifetime = null)

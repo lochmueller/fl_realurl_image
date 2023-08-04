@@ -1,6 +1,7 @@
 <?php
 
 
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 $tempColumns = [
     'realurl_image_name' => [
         'exclude' => 1,
@@ -14,6 +15,6 @@ $tempColumns = [
 ];
 
 
-\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('sys_file_reference', $tempColumns);
+ExtensionManagementUtility::addTCAcolumns('sys_file_reference', $tempColumns);
 
 $GLOBALS['TCA']['sys_file_reference']['palettes']['imageoverlayPalette']['showitem'] .= ',realurl_image_name';
