@@ -8,9 +8,11 @@
 
 namespace FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject;
 
+use TYPO3\CMS\Core\Core\Environment;
 use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
+use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -71,7 +73,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         if (!\is_array($info)) {
             return '';
         }
-        if (is_file(PATH_site . $info['3'])) {
+        if (is_file(Environment::getPublicPath() . '/' . $info['3'])) {
             $source = $tsfe->absRefPrefix . str_replace('%2F', '/', rawurlencode($info['3']));
         } else {
             $source = $info[3];
@@ -92,7 +94,6 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         $imageTagValues = [
             'width'               => (int)$info[0],
             'height'              => (int)$info[1],
-            'src'                 => htmlspecialchars($source),
             'params'              => $params,
             'altParams'           => $altParam,
             'border'              => $this->getBorderAttr(' border="' . (int)$conf['border'] . '"'),
@@ -111,7 +112,8 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
         // ### Here ends RealURL_Image ######
         // ##################################
 
-        $theValue = $this->templateService->substituteMarkerArray($imageTagTemplate, $imageTagValues, '###|###', true, true);
+        $markerTemplateEngine = GeneralUtility::makeInstance(MarkerBasedTemplateService::class);
+        $theValue = $markerTemplateEngine->substituteMarkerArray($imageTagTemplate, $imageTagValues, '###|###', true, true);
 
 
         $linkWrap = isset($conf['linkWrap.']) ? $this->stdWrap($conf['linkWrap'], $conf['linkWrap.']) : $conf['linkWrap'];

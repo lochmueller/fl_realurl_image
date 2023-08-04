@@ -7,13 +7,13 @@
 
 namespace FRUIT\FlRealurlImage\Xclass\Fluid\ViewHelpers\Uri;
 
+use TYPO3Fluid\Fluid\Core\ViewHelper\Exception;
 use TYPO3\CMS\Core\Imaging\ImageManipulation\CropVariantCollection;
 use FRUIT\FlRealurlImage\Service\ImageService;
 use TYPO3\CMS\Core\Resource\Exception\ResourceDoesNotExistException;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3Fluid\Fluid\Core\Rendering\RenderingContextInterface;
-use TYPO3\CMS\Fluid\Core\ViewHelper\Exception;
 
 /**
  * Overwrite Image ViewHelper
@@ -40,7 +40,7 @@ class ImageViewHelper extends \TYPO3\CMS\Fluid\ViewHelpers\Uri\ImageViewHelper
         $image = $arguments['image'];
         $treatIdAsReference = $arguments['treatIdAsReference'];
         $cropString = $arguments['crop'];
-        //$absolute = $arguments['absolute'];
+        $absolute = $arguments['absolute'];
 
         if (($src === null && $image === null) || ($src !== null && $image !== null)) {
             throw new Exception('You must either specify a string src or a File object.', 1460976233);

@@ -7,6 +7,8 @@
 
 namespace FRUIT\FlRealurlImage\Service;
 
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileReference;
 use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
@@ -26,7 +28,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
     protected $imageForRealName = null;
 
     /**
-     * @param \TYPO3\CMS\Core\Resource\File|\TYPO3\CMS\Core\Resource\FileReference $image
+     * @param File|FileReference $image
      * @param array $processingInstructions
      *
      * @return ProcessedFile
@@ -56,7 +58,7 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
         // call fl_realurl_image to generate $new_fileName
         /** @var RealUrlImage $tx_flrealurlimage */
         $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
-        $tx_flrealurlimage->start(null, null);
+        $tx_flrealurlimage->start([]);
         if ($image instanceof ProcessedFile) {
             $info = [3 => $imageUrl];
             $imageUrl = $tx_flrealurlimage->main([], $info, $this->imageForRealName);

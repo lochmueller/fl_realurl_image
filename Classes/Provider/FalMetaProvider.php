@@ -42,7 +42,7 @@ class FalMetaProvider extends AbstractProvider
             return '';
         }
         /** @var $file File */
-        $metaData = $file->_getMetaData();
+        $metaData = $file->getMetaData()->get();
         return isset($metaData[$key]) ? trim($metaData[$key]) : '';
     }
 }

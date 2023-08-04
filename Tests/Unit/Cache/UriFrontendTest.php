@@ -5,9 +5,9 @@
 
 namespace FRUIT\FlRealurlImage\Tests\Unit\Cache;
 
+use TYPO3\TestingFramework\Core\Unit\UnitTestCase;
 use FRUIT\FlRealurlImage\Cache\UriFrontend;
 use TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend;
-use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * UriFrontendTest
