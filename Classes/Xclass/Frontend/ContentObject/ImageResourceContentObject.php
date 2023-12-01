@@ -9,6 +9,8 @@
 namespace FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject;
 
 use FRUIT\FlRealurlImage\RealUrlImage;
+use TYPO3\CMS\Core\Package\PackageManager;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -28,7 +30,10 @@ class ImageResourceContentObject extends \TYPO3\CMS\Frontend\ContentObject\Image
      */
     public function render($conf = [])
     {
-        $this->cObj->setSkipRealUrlImageInGetImgResource(true);
+        if(ExtensionManagementUtility::isLoaded('trusted_url_params') === false)
+        {
+            $this->cObj->setSkipRealUrlImageInGetImgResource(true);
+        }
         $GLOBALS['TSFE']->lastImgResourceInfo = $this->cObj->getImgResource($conf['file'], $conf['file.']);
 
         // ###################################
