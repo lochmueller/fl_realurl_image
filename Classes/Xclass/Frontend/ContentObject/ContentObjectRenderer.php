@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Core\Environment;
 use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
+use TYPO3\CMS\Core\Resource\ProcessedFile;
 use TYPO3\CMS\Core\Service\MarkerBasedTemplateService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -74,7 +75,7 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             return '';
         }
         if (is_file(Environment::getPublicPath() . '/' . $info['3'])) {
-            $source = $tsfe->absRefPrefix . str_replace('%2F', '/', rawurlencode($info['3']));
+            $source = $tsfe->absRefPrefix . str_replace('%2F', '/', rawurlencode((string) $info['3']));
         } else {
             $source = $info[3];
         }
@@ -170,13 +171,27 @@ class ContentObjectRenderer extends \TYPO3\CMS\Frontend\ContentObject\ContentObj
             /** @var $tx_flrealurlimage \FRUIT\FlRealurlImage\RealUrlImage */
             $tx_flrealurlimage->start($this->data, $this->table);
             $new_fileName = $tx_flrealurlimage->main([], $result, $file, $this);
-            $result[3] = $tx_flrealurlimage->addAbsRefPrefix($new_fileName);
+            $result[3] = $this->cleanRelativePath($tx_flrealurlimage->addAbsRefPrefix($new_fileName));
+
+            /** @var ProcessedFile $processedFile */
+            $processedFile = $result['processedFile'];
+            $processedFile->updateProcessingUrl($result[3]);
+
+
+            #$result['processedFile']->updateProcessingUrl($result[3]);
             // ##################################
             // ### Here ends RealURL_Image ######
             // ##################################
         }
 
         return $result;
+    }
+
+    public function cleanRelativePath($path): string
+    {
+        $publicPath = Environment::getPublicPath();
+        $relativeOriginalPath = '/' . ltrim(str_replace($publicPath, '', $path), '/');
+        return $relativeOriginalPath;
     }
 
     /**

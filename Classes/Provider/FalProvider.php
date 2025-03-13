@@ -41,6 +41,6 @@ class FalProvider extends AbstractProvider
         }
         /** @var File $file */
         $information = $file->getProperties();
-        return isset($information[$key]) ? trim($information[$key]) : '';
+        return isset($information[$key]) ? trim((string) $information[$key]) : '';
     }
 }

@@ -30,8 +30,8 @@ class FileProvider extends AbstractProvider
      */
     public function getProviderInformation($key)
     {
-        if ($this->baseInformation['image'][$key] && strlen(trim($this->baseInformation['image'][$key]))) {
-            return trim($this->baseInformation['image'][$key]);
+        if ($this->baseInformation['image'][$key] && strlen(trim((string) $this->baseInformation['image'][$key]))) {
+            return trim((string) $this->baseInformation['image'][$key]);
         }
         return '';
     }

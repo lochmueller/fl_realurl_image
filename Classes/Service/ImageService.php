@@ -7,11 +7,14 @@
 
 namespace FRUIT\FlRealurlImage\Service;
 
+use TYPO3\CMS\Core\Http\ApplicationType;
+use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Resource\File;
 use TYPO3\CMS\Core\Resource\FileReference;
 use FRUIT\FlRealurlImage\RealUrlImage;
 use TYPO3\CMS\Core\Resource\FileInterface;
 use TYPO3\CMS\Core\Resource\ProcessedFile;
+use TYPO3\CMS\Core\Resource\ResourceFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -26,6 +29,22 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      * @var null
      */
     protected $imageForRealName = null;
+    protected ServerRequest $request;
+    protected RealUrlImage $realUrlImage;
+    protected ApplicationType $applicationType;
+
+    /**
+     * ImageService constructor.
+     */
+    public function __construct(
+        ResourceFactory $resourceFactory,
+    )
+    {
+        parent::__construct($resourceFactory);
+        $this->request = $GLOBALS['TYPO3_REQUEST'];
+        $this->realUrlImage = GeneralUtility::makeInstance(RealUrlImage::class);
+        $this->applicationType = ApplicationType::fromRequest($this->request);
+    }
 
     /**
      * @param File|FileReference $image
@@ -49,19 +68,17 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
      */
     public function getImageUri(FileInterface $image, $absolute = false): string
     {
-        if ($image->getStorage()->getDriverType() === 'Local' && !$image->getStorage()->isPublic() && $this->environmentService->isEnvironmentInFrontendMode()) {
+        if ($image->getStorage()->getDriverType() === 'Local' && !$image->getStorage()->isPublic() && $this->applicationType->isFrontend()) {
             $imageUrl = $image->getForLocalProcessing(false);
         } else {
             $imageUrl = $image->getPublicUrl();
         }
 
         // call fl_realurl_image to generate $new_fileName
-        /** @var RealUrlImage $tx_flrealurlimage */
-        $tx_flrealurlimage = GeneralUtility::makeInstance(RealUrlImage::class);
-        $tx_flrealurlimage->start([]);
+        $this->realUrlImage->start([]);
         if ($image instanceof ProcessedFile) {
             $info = [3 => $imageUrl];
-            $imageUrl = $tx_flrealurlimage->main([], $info, $this->imageForRealName);
+            $imageUrl = $this->realUrlImage->main([], $info, $this->imageForRealName);
         }
         $this->imageForRealName = null;
 
@@ -69,8 +86,8 @@ class ImageService extends \TYPO3\CMS\Extbase\Service\ImageService
         // no prefix in case of an already fully qualified URL
         if (isset($parsedUrl['host'])) {
             $uriPrefix = '';
-        } elseif ($this->environmentService->isEnvironmentInFrontendMode()) {
-            $imageUrl = $tx_flrealurlimage->addAbsRefPrefix($imageUrl);
+        } elseif ($this->applicationType->isFrontend()) {
+            $imageUrl = $this->realUrlImage->addAbsRefPrefix($imageUrl);
             $uriPrefix = '';
             $parsedUrl = parse_url($imageUrl);
         } else {

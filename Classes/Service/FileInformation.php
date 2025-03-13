@@ -26,11 +26,10 @@ class FileInformation
      * Get information from the fal record of the current rendering
      *
      * @param array $imageInformation
-     * @param mixed $fileTypeInformation
      *
      * @return array
      */
-    public function getByFal($imageInformation, $fileTypeInformation)
+    public function getByFal($imageInformation, mixed $fileTypeInformation)
     {
         if ($imageInformation['originalFile'] instanceof File) {
             return $imageInformation['originalFile']->getProperties();
@@ -80,7 +79,7 @@ class FileInformation
                             ->getFileReferenceObject($file);
                     }
                 }
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 return [];
             }
         }
