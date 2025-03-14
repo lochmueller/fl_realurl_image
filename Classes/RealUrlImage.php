@@ -540,9 +540,9 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @throws \Exception
      */
-    protected function createFileCache($relativeOriginalPath, $relativeNewPath): void
+    public function createFileCache(string $relativeOriginalPath, string $relativeNewPath): void
     {
-        $publicPath = Environment::getPublicPath();
+        $publicPath = $_SERVER['DOCUMENT_ROOT']; // Environment::getPublicPath() is not enough for building symlinks, so we use document root instead
         $relativeOriginalPath = $this->cleanRelativePath($relativeOriginalPath);
         $relativeNewPath = $this->cleanRelativePath($relativeNewPath);
 
