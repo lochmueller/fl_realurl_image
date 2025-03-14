@@ -8,6 +8,8 @@
 
 namespace FRUIT\FlRealurlImage;
 
+use FRUIT\FlRealurlImage\Event\FileCacheEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -82,6 +84,7 @@ class RealUrlImage extends ContentObjectRenderer
     protected $enable = true;
 
     protected Configuration $configuration;
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * Outputting the image that fits to the realurl_image request
@@ -120,6 +123,9 @@ class RealUrlImage extends ContentObjectRenderer
             // The obviously lost image will be shown much faster next time
             if ($this->configuration->get('fileLinks')) {
                 $this->createFileCache($data['image_path'], $data['realurl_path']);
+                $this->eventDispatcher->dispatch(
+                    new FileCacheEvent($data['image_path'], $data['realurl_path'])
+                );
             }
             // cacheControl is switched on and the image has not been modified since last request
             // => loaded from browser cache
@@ -171,7 +177,8 @@ class RealUrlImage extends ContentObjectRenderer
      */
     public function main(array $conf, array $info, mixed $file = null, $cObj = null)
     {
-        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
+        $this->initConfiguration();
+        $this->eventDispatcher = GeneralUtility::makeInstance(EventDispatcherInterface::class);
 
         if($file instanceof FileReference)
         {
@@ -229,6 +236,11 @@ class RealUrlImage extends ContentObjectRenderer
         $this->org_fileName = urldecode((string) $image[3]);
     }
 
+    public function initConfiguration(): void
+    {
+        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
+    }
+
     /**
      * The main function of fl_realurl_image
      * - generates $this->new_fileName
@@ -275,6 +287,11 @@ class RealUrlImage extends ContentObjectRenderer
         $this->deleteFileCache($this->org_fileName, $this->new_fileName);
         // create the new file cache
         $this->createFileCache($this->org_fileName, $this->new_fileName);
+
+        $this->eventDispatcher->dispatch(
+            new FileCacheEvent($this->org_fileName, $this->new_fileName)
+        );
+
         return $this->virtualPathRemove($this->new_fileName);
     }
 
