@@ -8,8 +8,9 @@ $tempColumns = [
         'label'   => 'LLL:EXT:fl_realurl_image/Resources/Private/Language/locallang.xml:sys_file_metadata.realurl_image_name',
         'config'  => [
             'type'    => 'input',
-            'eval'    => 'trim,null',
+            'eval'    => 'trim',
             'default' => '',
+            'nullable' => true,
         ]
     ],
 ];

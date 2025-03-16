@@ -8,6 +8,8 @@
 
 namespace FRUIT\FlRealurlImage;
 
+use FRUIT\FlRealurlImage\Event\FileCacheEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Charset\CharsetConverter;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -21,14 +23,15 @@ use FRUIT\FlRealurlImage\Provider\PageProvider;
 use FRUIT\FlRealurlImage\Provider\TypoScriptProvider;
 use FRUIT\FlRealurlImage\Provider\VhsPictureProvider;
 use FRUIT\FlRealurlImage\Provider\ViewHelperProvider;
-use HDNET\RealurlReplacement\Service\ReplacementService;
 use TYPO3\CMS\Core\Cache\CacheManager;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
+use TYPO3\CMS\Core\Resource\File;
+use TYPO3\CMS\Core\Resource\FileReference;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\PathUtility;
 use TYPO3\CMS\Core\Utility\ArrayUtility;
-use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
+use FRUIT\FlRealurlImage\Xclass\Frontend\ContentObject\ContentObjectRenderer;
 
 /**
  * The main class of fl_realurl_image
@@ -63,13 +66,6 @@ class RealUrlImage extends ContentObjectRenderer
     protected $image = [];
 
     /**
-     * info about the file type
-     *
-     * @var array
-     */
-    protected $fileTypeInformation = [];
-
-    /*
       - 0: Height
       - 1: Weight
       - 2: Type-Ending
@@ -78,25 +74,17 @@ class RealUrlImage extends ContentObjectRenderer
       - origFile_mtime: 1249081200
       - fileCacheHash: ed0180473f
      */
+    protected $fileTypeInformation = [];
+
+
     protected $new_fileName = '';
 
     protected $org_fileName = '';
 
     protected $enable = true;
 
-    /**
-     * @var Configuration
-     */
-    protected $configuration = null;
-
-    /**
-     * Build up the object
-     */
-    public function __construct()
-    {
-        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $this->configuration = $objectManager->get(Configuration::class);
-    }
+    protected Configuration $configuration;
+    private EventDispatcherInterface $eventDispatcher;
 
     /**
      * Outputting the image that fits to the realurl_image request
@@ -112,7 +100,7 @@ class RealUrlImage extends ContentObjectRenderer
     public function showImage()
     {
         // Path of the requested image
-        $path = str_replace(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
+        $path = str_replace(GeneralUtility::getIndpEnv('TYPO3_SITE_URL'), '', (string) GeneralUtility::getIndpEnv('TYPO3_REQUEST_URL'));
         $path = trim($path, '/');
         $cacheIdentifier = $path;
         // look up in DB-table if there is a image stored for this realurl
@@ -121,10 +109,10 @@ class RealUrlImage extends ContentObjectRenderer
             // get the information to the requested image
             $data = unserialize($cache->get($cacheIdentifier), FALSE);
             // update DB to idicate that image was requested
-            if (!strstr($data['page_id'], '?')) {
+            if (!strstr((string) $data['page_id'], '?')) {
                 $page_id = trim($data['page_id'] . ',?', ',');
             } else {
-                $page_id = trim($data['page_id'], ',');
+                $page_id = trim((string) $data['page_id'], ',');
             }
             $data['tstamp'] = time();
             $data['page_id'] = $page_id;
@@ -135,11 +123,14 @@ class RealUrlImage extends ContentObjectRenderer
             // The obviously lost image will be shown much faster next time
             if ($this->configuration->get('fileLinks')) {
                 $this->createFileCache($data['image_path'], $data['realurl_path']);
+                $this->eventDispatcher->dispatch(
+                    new FileCacheEvent($data['image_path'], $data['realurl_path'])
+                );
             }
             // cacheControl is switched on and the image has not been modified since last request
             // => loaded from browser cache
             if ($this->configuration->get('cacheControl') && $_SERVER['HTTP_IF_MODIFIED_SINCE']) {
-                $lastGet = strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']);
+                $lastGet = strtotime((string) $_SERVER['HTTP_IF_MODIFIED_SINCE']);
                 if ($data['tstamp'] != 0 && $lastGet <= $data['tstamp']) {
                     header('HTTP/1.1 304 Not Modified');
                     die();
@@ -169,10 +160,10 @@ class RealUrlImage extends ContentObjectRenderer
      */
     public function addAbsRefPrefix($url)
     {
-        if (strpos($url, 'http://') !== false || strpos($url, 'https://') !== false) {
+        if (str_contains((string) $url, 'http://') || str_contains((string) $url, 'https://')) {
             return $url;
         }
-        return htmlspecialchars($GLOBALS['TSFE']->absRefPrefix) . ltrim($url, '/');
+        return htmlspecialchars((string) $GLOBALS['TSFE']->absRefPrefix) . ltrim((string) $url, '/');
     }
 
     /**
@@ -180,22 +171,30 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @param array $conf IMAGE-Object configuration array
      * @param array $info image info array:
-     * @param mixed $file
      *
      * @param null $cObj
-     *
      * @return string
      */
-    public function main($conf, $info, $file = null, $cObj = null)
+    public function main(array $conf, array $info, mixed $file = null, $cObj = null)
     {
-        $this->init($conf, $info, $file, $cObj);
+        $this->initConfiguration();
+        $this->eventDispatcher = GeneralUtility::makeInstance(EventDispatcherInterface::class);
 
-        if ($this->enable && trim($this->org_fileName) !== '') {
-            $new = $this->generateFileName();
-            if ($new !== '') {
-                return $new;
+        if($file instanceof FileReference)
+        {
+            $this->init($conf, $info, $file, $cObj);
+            if ($this->enable && trim((string) $this->org_fileName) !== '') {
+                $new = $this->generateFileName();
+                if ($new !== '') {
+                    return $new;
+                }
             }
         }
+        if($file instanceof File)
+        {
+            $this->org_fileName = $file->getPublicUrl();
+        }
+
         return $this->org_fileName;
     }
 
@@ -204,62 +203,42 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @param array $conf IMAGE-Object configuration array
      * @param array $image image info array:
-     * @param mixed $file
      *
      * @param       $cObj
      */
-    protected function init($conf, $image, $file, $cObj)
+    protected function init(array $conf, array $image, FileReference $file, ContentObjectRenderer $cObj = null)
     {
         // IMAGE_conf
         $this->IMAGE_conf = $conf;
         $this->currentCobj = $cObj;
 
         // fl_conf
-        $global_conf = [];
-        if (\is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'])) {
-            $global_conf = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.'];
-        }
-        $local_conf = [];
-        if (\is_array($conf['fl_realurl_image.'])) {
-            $local_conf = $conf['fl_realurl_image.'];
-        }
-
-        ArrayUtility::mergeRecursiveWithOverrule($global_conf, $local_conf);
-
-        $this->fl_conf = $global_conf;
+        $configurationManager = GeneralUtility::makeInstance(ConfigurationManagerInterface::class);
+        $settings = $configurationManager->getConfiguration(ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT);
+        $this->fl_conf = GeneralUtility::removeDotsFromTS($settings['config.']['fl_realurl_image.'] ?? []);
+        $local_conf = $conf['fl_realurl_image.'] ?? [];
+        ArrayUtility::mergeRecursiveWithOverrule($this->fl_conf, $local_conf);
 
         // image Array
         $this->image = $image;
 
         // filetype
-        $this->fileTypeInformation = $file;
+        $this->fileTypeInformation = $image;
+        $this->enable = (bool)($this->fl_conf['enable'] ?? 0);
 
-        // new_fileName
-        if ($conf['fl_realurl_image']) {
-            $this->new_fileName = $conf['fl_realurl_image'];
-        } else {
-            $this->new_fileName = $GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image'];
-        }
-        if ($this->new_fileName === '1') {
-            $this->new_fileName = '';
-        }
-
-        $enableByConfiguration = (bool)$this->fl_conf['enable'];
-        if (!$enableByConfiguration) {
-            $this->enable = $enableByConfiguration;
-        }
-
-        // enable
-        if ($this->new_fileName === 0
-			|| !\is_array($GLOBALS['TSFE']->tmpl->setup['config.']['fl_realurl_image.']) // no static template
-			|| strtolower($this->new_fileName) === 'off'  // fl_realurl_image switched off on this page
-
-        ) {
+        $this->new_fileName = $file->getProperty('realurl_image_name');
+        if($this->new_fileName === '' || $this->new_fileName === 'off')
+        {
             $this->enable = false;
         }
 
         // org_fileName
-        $this->org_fileName = urldecode($image[3]);
+        $this->org_fileName = urldecode((string) $image[3]);
+    }
+
+    public function initConfiguration(): void
+    {
+        $this->configuration = GeneralUtility::makeInstance(Configuration::class);
     }
 
     /**
@@ -273,7 +252,7 @@ class RealUrlImage extends ContentObjectRenderer
     protected function generateFileName()
     {
         // generate a text basis for a speaking file name
-        if ($this->fl_conf['data'] && $this->new_fileName == '') {
+        if ($this->fl_conf['data'] && $this->new_fileName === '') {
             $this->new_fileName = $this->generateTextBase();
         }
         if ($this->new_fileName === '') {
@@ -281,10 +260,10 @@ class RealUrlImage extends ContentObjectRenderer
         }
         unset($this->fl_conf['data']); // important otherwise stdWrap overwrites so far generated new_fileName
         // if $textBase is already a filename then get only the name itself with no path or ending
-        if (strstr($this->new_fileName, '/')) {
-            $this->new_fileName = basename($this->new_fileName);
+        if (strstr((string) $this->new_fileName, '/')) {
+            $this->new_fileName = basename((string) $this->new_fileName);
         }
-        if (strstr($this->new_fileName, '.')) {
+        if (strstr((string) $this->new_fileName, '.')) {
             $this->new_fileName = str_replace([
                 '.jpg',
                 '.JPG',
@@ -293,8 +272,9 @@ class RealUrlImage extends ContentObjectRenderer
                 '.png',
                 '.PNG',
                 '.gif',
-                '.GIF'
-            ], '', $this->new_fileName);
+                '.GIF',
+                '.webp'
+            ], '', (string) $this->new_fileName);
         }
         // make this text basis suitable for a file name
         $this->new_fileName = $this->smartEncoding($this->new_fileName);
@@ -307,6 +287,11 @@ class RealUrlImage extends ContentObjectRenderer
         $this->deleteFileCache($this->org_fileName, $this->new_fileName);
         // create the new file cache
         $this->createFileCache($this->org_fileName, $this->new_fileName);
+
+        $this->eventDispatcher->dispatch(
+            new FileCacheEvent($this->org_fileName, $this->new_fileName)
+        );
+
         return $this->virtualPathRemove($this->new_fileName);
     }
 
@@ -317,9 +302,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function generateTextBase()
     {
-
         $configurations = $this->getConfigurationValues();
-
         $baseInformation = [
             'image' => $this->image,
             'fileTypeInformation' => $this->fileTypeInformation,
@@ -338,14 +321,15 @@ class RealUrlImage extends ContentObjectRenderer
             new FileProvider($baseInformation),
         ];
 
-        foreach ($configurations as $configuration) {
+        foreach ($configurations as $configuration)
+        {
             $item = $configuration['config'];
 
             foreach ($providers as $provider) {
                 /** @var $provider AbstractProvider */
                 if ($provider->getProviderIdentifier() === $configuration['source']) {
                     $value = $provider->getProviderInformation($item);
-                    if (strlen($value)) {
+                    if (strlen((string) $value)) {
                         return $value;
                     }
                 }
@@ -414,32 +398,24 @@ class RealUrlImage extends ContentObjectRenderer
         }
         // spaceCharacter
         $textBase = strtr($textBase, ' -+_', $space . $space . $space);
-        // use realurl replacement Service on textBase if installed
-        // todo: add hook instead hardcoded
-        if (ExtensionManagementUtility::isLoaded('realurl_replacement')) {
-            /** @var ReplacementService $realurlReplacementService */
-            $realurlReplacementService = GeneralUtility::makeInstance(ReplacementService::class);
-            $textBase = $realurlReplacementService->replaceString($textBase);
-        } else {
-            // smartEncoding
-            if ($this->fl_conf['smartEncoding']) {
-                $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ? $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] : $GLOBALS['TSFE']->defaultCharSet;
 
-                if (is_null($charset)) {
-                    $charset = 'utf-8';
-                }
-                $textBase = GeneralUtility::makeInstance(CharsetConverter::class)->specCharsToASCII($charset, $textBase);
-                // Convert extended letters to ascii equivalents
-                $textBase = preg_replace('/[^a-z0-9\/\\\]/i', $space, $textBase); // replace the rest with $space
+        // smartEncoding
+        if ($this->fl_conf['smartEncoding']) {
+            $charset = $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] ?? $GLOBALS['TSFE']->defaultCharSet;
+
+            if (is_null($charset)) {
+                $charset = 'utf-8';
             }
+            $textBase = GeneralUtility::makeInstance(CharsetConverter::class)->specCharsToASCII($charset, $textBase);
+            // Convert extended letters to ascii equivalents
+            $textBase = preg_replace('/[^a-z0-9\/\\\]/i', (string) $space, $textBase); // replace the rest with $space
         }
+
         // spaceCharacter
-        $textBase = preg_replace('/[\/\\' . $space . ']+' . '/i', $space, $textBase); // Convert multiple $space to a single one
+        $textBase = preg_replace('/[\/\\' . $space . ']+' . '/i', (string) $space, (string) $textBase); // Convert multiple $space to a single one
         $textBase = trim($textBase, $space); // trim $space
         // encoded $textBase
-        $textBase = rawurlencode($textBase);
-        // return
-        return $textBase;
+        return rawurlencode($textBase);
     }
 
     /**
@@ -451,18 +427,18 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function addHash($textBase)
     {
-        if (isset($this->image[3]) && strlen($this->image[3])) {
-            $hashBase = GeneralUtility::shortMD5($this->image[3], 24);
+        if (isset($this->image[3]) && strlen((string) $this->image[3])) {
+            $hashBase = substr(md5((string) $this->image[3]), 0, 24);
         } else {
             $hashBase = PathUtility::pathinfo($this->org_fileName, PATHINFO_BASENAME);
         }
         $hashLength = isset($this->fl_conf['hashLength']) ? MathUtility::forceIntegerInRange(
             (int)$this->fl_conf['hashLength'],
             0,
-            strlen($hashBase)
+            strlen((string) $hashBase)
         ) : 0;
         if ($hashLength) {
-            $textBase .= $this->getSpaceCharacter() . substr($hashBase, 0, $hashLength);
+            $textBase .= $this->getSpaceCharacter() . substr((string) $hashBase, 0, $hashLength);
         }
         return $textBase . '.' . PathUtility::pathinfo($this->org_fileName, PATHINFO_EXTENSION);
     }
@@ -474,7 +450,7 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function getSpaceCharacter()
     {
-        if (isset($this->fl_conf['spaceCharacter']) && strlen($this->fl_conf['spaceCharacter'])) {
+        if (isset($this->fl_conf['spaceCharacter']) && strlen((string) $this->fl_conf['spaceCharacter'])) {
             return $this->fl_conf['spaceCharacter'];
         }
         return '-';
@@ -527,14 +503,14 @@ class RealUrlImage extends ContentObjectRenderer
      */
     protected function writeDB($new_fileName)
     {
-
         $cache = $this->getCache();
         $cacheIdent = $this->org_fileName;
+        $currentPage = $this->getTypoScriptFrontendController()->id;
         if ($cache->has($cacheIdent)) {
-            $data = unserialize($cache->get($new_fileName));
-            $pids = GeneralUtility::intExplode(',', $data['page_id'], true);
-            if (!in_array((int)$GLOBALS['TSFE']->id, $pids)) {
-                $pids[] = (int)$GLOBALS['TSFE']->id;
+            $data = $cache->get($cacheIdent);
+            $pids = GeneralUtility::intExplode(',', (string)$data['page_id'], true);
+            if (!in_array($currentPage, $pids)) {
+                $pids[] = $currentPage;
             }
             $data['tstamp'] = time();
             $data['page_id'] = implode(',', $pids);
@@ -544,7 +520,7 @@ class RealUrlImage extends ContentObjectRenderer
                 'tstamp' => time(),
                 'image_path' => $this->org_fileName,
                 'new_path' => $new_fileName,
-                'page_id' => $GLOBALS['TSFE']->id
+                'page_id' => $currentPage
             ];
         }
         $cache->set($cacheIdent, serialize($data));
@@ -581,9 +557,13 @@ class RealUrlImage extends ContentObjectRenderer
      *
      * @throws \Exception
      */
-    protected function createFileCache($relativeOriginalPath, $relativeNewPath)
+    public function createFileCache(string $relativeOriginalPath, string $relativeNewPath): void
     {
-        $absoluteOriginalPath = $_SERVER['DOCUMENT_ROOT'] . $relativeOriginalPath;
+        $publicPath = $_SERVER['DOCUMENT_ROOT']; // Environment::getPublicPath() is not enough for building symlinks, so we use document root instead
+        $relativeOriginalPath = $this->cleanRelativePath($relativeOriginalPath);
+        $relativeNewPath = $this->cleanRelativePath($relativeNewPath);
+
+        $absoluteOriginalPath = $publicPath . $relativeOriginalPath;
 
         if (!is_file($absoluteOriginalPath)) {
             $relativeOriginalPath = rawurldecode($relativeOriginalPath);
@@ -598,7 +578,7 @@ class RealUrlImage extends ContentObjectRenderer
             return;
         }
 
-        $absoluteNewPath = GeneralUtility::getFileAbsFileName($relativeNewPath);
+        $absoluteNewPath = $publicPath . $relativeNewPath;
         if (is_file($absoluteNewPath) || is_link($absoluteNewPath)) {
             return;
         }
@@ -609,13 +589,13 @@ class RealUrlImage extends ContentObjectRenderer
         }
 
         // create folder if required
-        $new_folder = GeneralUtility::dirname($relativeNewPath);
+        $new_folder = $publicPath . GeneralUtility::dirname($relativeNewPath);
         if ($new_folder && !is_dir($new_folder)) {
             if (!GeneralUtility::mkdir($new_folder)) {
                 throw new \Exception('Can\'t create the fl_realurl_image Folder "' . $new_folder . '"');
             }
         }
-        $indexFile = rtrim($new_folder, '/') . '/index.html';
+        $indexFile = rtrim((string) $new_folder, '/') . '/index.html';
         if (!is_file($indexFile)) {
             touch($indexFile);
         }
@@ -664,9 +644,7 @@ class RealUrlImage extends ContentObjectRenderer
         if ($cache !== null) {
             return $cache;
         }
-        /** @var CacheManager $cacheManager */
-        $objectManager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
-        $cacheManager = $objectManager->get(CacheManager::class);
+        $cacheManager = GeneralUtility::makeInstance(CacheManager::class);
         $cache = $cacheManager->getCache('fl_realurl_image');
         return $cache;
     }

@@ -48,8 +48,8 @@ class ViewHelperProvider extends AbstractProvider
      */
     public function getProviderInformation($key)
     {
-        if (self::$viewHelperInformation !== null && isset(self::$viewHelperInformation[$key]) && trim(self::$viewHelperInformation[$key]) !== '') {
-            return trim(self::$viewHelperInformation[$key]);
+        if (self::$viewHelperInformation !== null && isset(self::$viewHelperInformation[$key]) && trim((string) self::$viewHelperInformation[$key]) !== '') {
+            return trim((string) self::$viewHelperInformation[$key]);
         }
         return '';
     }

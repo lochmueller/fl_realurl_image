@@ -43,6 +43,6 @@ class FalMetaProvider extends AbstractProvider
         }
         /** @var $file File */
         $metaData = $file->getMetaData()->get();
-        return isset($metaData[$key]) ? trim($metaData[$key]) : '';
+        return isset($metaData[$key]) ? trim((string) $metaData[$key]) : '';
     }
 }

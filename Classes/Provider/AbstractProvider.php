@@ -22,8 +22,6 @@ abstract class AbstractProvider
 
     /**
      * AbstractProvider constructor.
-     *
-     * @param array $baseInformation
      */
     public function __construct(array $baseInformation)
     {

@@ -39,7 +39,7 @@ class PageProvider extends AbstractProvider
     public function getProviderInformation($key)
     {
         $pageInformation = $this->getPageInformation();
-        return isset($pageInformation[$key]) ? trim($pageInformation[$key]) : '';
+        return isset($pageInformation[$key]) ? trim((string) $pageInformation[$key]) : '';
     }
 
     /**

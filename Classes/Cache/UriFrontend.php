@@ -44,11 +44,11 @@ class UriFrontend extends VariableFrontend
     public function set($entryIdentifier, $string, array $tags = [], $lifetime = null)
     {
         if (!$this->isValidEntryIdentifier($entryIdentifier)) {
-            throw new \InvalidArgumentException('"' . $entryIdentifier . '" is not a valid cache entry identifier.', 1233057566);
+            throw new \InvalidArgumentException('"' . $entryIdentifier . '" is not a valid cache entry identifier.', 1_233_057_566);
         }
         foreach ($tags as $tag) {
             if (!$this->isValidTag($tag)) {
-                throw new \InvalidArgumentException('"' . $tag . '" is not a valid tag for a cache entry.', 1233057512);
+                throw new \InvalidArgumentException('"' . $tag . '" is not a valid tag for a cache entry.', 1_233_057_512);
             }
         }
         $this->backend->set($entryIdentifier, $string, $tags, $lifetime);

@@ -28,10 +28,7 @@ class Configuration
     public function get($name)
     {
         $extensionConfiguration = $this->getExtensionConfiguration();
-        if (isset($extensionConfiguration[$name])) {
-            return $extensionConfiguration[$name];
-        }
-        return false;
+        return $extensionConfiguration[$name] ?? false;
     }
 
     /**

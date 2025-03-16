@@ -49,7 +49,7 @@ class VhsPictureProvider extends AbstractProvider
         }
         $file = $this->baseInformation['image']['originalFile'];
 
-        list($source, $field) = explode(':', $key);
+        [$source, $field] = explode(':', $key);
         if ($source === 'fal') {
             $provider = GeneralUtility::makeInstance(FalProvider::class, ['file' => $file]);
         } elseif ($source === 'falmeta') {
@@ -60,7 +60,7 @@ class VhsPictureProvider extends AbstractProvider
 
         /** @var $provider AbstractProvider */
         $value = $provider->getProviderInformation($field);
-        return strlen($value) ? $value . $this->getDimensions() : '';
+        return strlen((string) $value) ? $value . $this->getDimensions() : '';
     }
 
     /**

@@ -34,8 +34,8 @@ class FalReferenceProvider extends AbstractProvider
     public function getProviderInformation($key)
     {
         $falReferenceInfo = $this->getFALReferenceInfo();
-        if ($falReferenceInfo[$key] && strlen(trim($falReferenceInfo[$key]))) {
-            return trim($falReferenceInfo[$key]);
+        if ($falReferenceInfo[$key] && strlen(trim((string) $falReferenceInfo[$key]))) {
+            return trim((string) $falReferenceInfo[$key]);
         }
         return '';
     }
